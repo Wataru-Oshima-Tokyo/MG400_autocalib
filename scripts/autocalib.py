@@ -22,7 +22,6 @@ class AUTOCALIB:
 		image = self.bridge.imgmsg_to_cv2(msg, desired_encoding = 'bgr8')
 		self.hsv = cv.cvtColor(image, cv.COLOR_BGR2HSV)  #色空間の変換(BGR→HSV)
 		cv.namedWindow('hsv')
-		cv.setMouseCallback('hsv', self.mouseEvent)
 		# now click into the hsv img , and look at values:
 		gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
 		circles = cv.HoughCircles(gray, cv.HOUGH_GRADIENT, dp=1, minDist=20, param1=100, param2=60, minRadius=0, maxRadius=0)
@@ -35,7 +34,7 @@ class AUTOCALIB:
 		cv.imshow("hsv",self.hsv)
 		cv.waitKey(3)
 
-		
+
 if __name__=="__main__":
 	print("Start")
 	rospy.init_node('follower')
