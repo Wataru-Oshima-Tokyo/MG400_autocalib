@@ -8,7 +8,7 @@ import cv_bridge
 import numpy as np
 
 
-class Follower:
+class AUTOCALIB:
 	def __init__(self):
 		print("__init__")
 		self.bridge = cv_bridge.CvBridge()
