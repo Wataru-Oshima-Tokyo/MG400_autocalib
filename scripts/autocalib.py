@@ -22,12 +22,13 @@ class AUTOCALIB:
 		self.image = self.bridge.imgmsg_to_cv2(msg, desired_encoding = 'bgr8')
 		# now click into the hsv img , and look at values:
 		self.hsv = cv.cvtColor(self.image, cv.COLOR_BGR2HSV)
+		self.gray =cv.cvtoColor(self.image,cv.COLOR_BGR2GRAY)
 		lower_yellow=np.array([20,7,215])
 		upper_yellow=np.array([40,27,295])
 		mask=cv.inRange(self.hsv, lower_yellow, upper_yellow)
 		self.masked=cv.bitwise_and(self.image, self.image, mask=mask)
 		thresh = 100
-		ret,thresh_img = cv.threshold(self.masked, thresh, 255, cv.THRESH_BINARY)
+		ret,thresh_img = cv.threshold(self.gray, thresh, 255, cv.THRESH_BINARY)
 		#find contours
 		contours, hierarchy = cv.findContours(thresh_img, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
 		cv.drawContours(self.image, contours,-1, (0,255,0), 3)
