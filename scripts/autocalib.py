@@ -21,8 +21,12 @@ class AUTOCALIB:
 		#print("I will write down codes below")
 		self.image = self.bridge.imgmsg_to_cv2(msg, desired_encoding = 'bgr8')
 		# now click into the hsv img , and look at values:
-		self.gray = cv.cvtColor(self.image, cv.COLOR_BGR2GRAY)
-		circles = cv.HoughCircles(self.gray, cv.HOUGH_GRADIENT, dp=1, minDist=20, param1=100, param2=60, minRadius=0, maxRadius=0)
+		self.hsv = cv.cvtColor(self.image, cv.COLOR_BGR2HSV)
+		lower_yellow=np.array([20,0,215])
+		upper_yellow=np.array([40,20,295])
+		mask=cv.inRange(self.hsv, lower_yellow, upper_yellow)
+		self.masked=cv.bitwise_and(self.image, self.image, mask=mask)
+		circles = cv.HoughCircles(self.masked, cv.HOUGH_GRADIENT, dp=1, minDist=20, param1=100, param2=60, minRadius=0, maxRadius=0)
 		circles = np.uint16(np.around(circles))
 		for circle in circles[0, :]:
 		    # 円周を描画する
