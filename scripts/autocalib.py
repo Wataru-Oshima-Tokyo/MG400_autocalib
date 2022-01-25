@@ -22,17 +22,20 @@ class AUTOCALIB:
 		self.image = self.bridge.imgmsg_to_cv2(msg, desired_encoding = 'bgr8')
 		# now click into the hsv img , and look at values:
 		self.hsv = cv.cvtColor(self.image, cv.COLOR_BGR2HSV)
-		lower_yellow=np.array([20,0,215])
-		upper_yellow=np.array([40,20,295])
+		lower_yellow=np.array([20,7,215])
+		upper_yellow=np.array([40,27,295])
 		mask=cv.inRange(self.hsv, lower_yellow, upper_yellow)
 		self.masked=cv.bitwise_and(self.image, self.image, mask=mask)
-		circles = cv.HoughCircles(self.masked, cv.HOUGH_GRADIENT, dp=1, minDist=20, param1=100, param2=60, minRadius=0, maxRadius=0)
-		circles = np.uint16(np.around(circles))
-		for circle in circles[0, :]:
-		    # 円周を描画する
-			cv.circle(self.image, (circle[0], circle[1]), circle[2], (0, 165, 255), 5)
-			# 中心点を描画する
-			cv.circle(self.image, (circle[0], circle[1]), 2, (0, 0, 255), 3)    
+		#find contours
+		contours, hierarchy = cv.findContours(self.masked, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+		cv.drawContours(self.image, contours,-1, (0,255,0), 3)
+		# circles = cv.HoughCircles(self.masked, cv.HOUGH_GRADIENT, dp=1, minDist=20, param1=100, param2=60, minRadius=0, maxRadius=0)
+		# circles = np.uint16(np.around(circles))
+		# for circle in circles[0, :]:
+		#     # 円周を描画する
+		# 	cv.circle(self.image, (circle[0], circle[1]), circle[2], (0, 165, 255), 5)
+		# 	# 中心点を描画する
+		# 	cv.circle(self.image, (circle[0], circle[1]), 2, (0, 0, 255), 3)    
 		cv.imshow("hsv",self.image)
 		cv.waitKey(3)
 
