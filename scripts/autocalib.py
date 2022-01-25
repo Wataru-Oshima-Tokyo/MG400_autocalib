@@ -26,13 +26,14 @@ class AUTOCALIB:
 		upper_yellow=np.array([40,20,295])
 		mask=cv.inRange(self.hsv, lower_yellow, upper_yellow)
 		self.masked=cv.bitwise_and(self.image, self.image, mask=mask)
-		circles = cv.HoughCircles(self.masked, cv.HOUGH_GRADIENT, dp=1, minDist=20, param1=100, param2=60, minRadius=0, maxRadius=0)
-		circles = np.uint16(np.around(circles))
-		for circle in circles[0, :]:
+                cv.imshow("masked",self.masked)
+		#circles = cv.HoughCircles(mask, cv.HOUGH_GRADIENT, dp=1, minDist=20, param1=100, param2=60, minRadius=0, maxRadius=0)
+		#circles = np.uint16(np.around(circles))
+		#for circle in circles[0, :]:
 		    # 円周を描画する
-			cv.circle(self.image, (circle[0], circle[1]), circle[2], (0, 165, 255), 5)
+		#	cv.circle(self.image, (circle[0], circle[1]), circle[2], (0, 165, 255), 5)
 			# 中心点を描画する
-			cv.circle(self.image, (circle[0], circle[1]), 2, (0, 0, 255), 3)    
+		#	cv.circle(self.image, (circle[0], circle[1]), 2, (0, 0, 255), 3)    
 		cv.imshow("hsv",self.image)
 		cv.waitKey(3)
 
