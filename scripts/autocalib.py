@@ -25,12 +25,12 @@ class AUTOCALIB:
 		self.gray =cv.cvtColor(self.image,cv.COLOR_BGR2GRAY)
 		lower_yellow=np.array([20,7,215])
 		upper_yellow=np.array([40,27,295])
-		mask=cv.inRange(self.hsv, lower_yellow, upper_yellow)
-		self.masked=cv.bitwise_and(self.image, self.image, mask=mask)
+		self.mask=cv.inRange(self.hsv, lower_yellow, upper_yellow)
+		self.masked=cv.bitwise_and(self.image, self.image, mask=self.mask)
 		thresh = 100
 		ret,thresh_img = cv.threshold(self.gray, thresh, 255, cv.THRESH_BINARY)
 		#find contours
-		contours, hierarchy = cv.findContours(thresh_img, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+		contours, hierarchy = cv.findContours(self.mask, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
 		cv.drawContours(self.image, contours,-1, (0,255,0), 3)
 		# circles = cv.HoughCircles(self.masked, cv.HOUGH_GRADIENT, dp=1, minDist=20, param1=100, param2=60, minRadius=0, maxRadius=0)
 		# circles = np.uint16(np.around(circles))
