@@ -22,7 +22,7 @@ class AUTOCALIB:
 		self.image = self.bridge.imgmsg_to_cv2(msg, desired_encoding = 'bgr8')
 		# now click into the hsv img , and look at values:
 		self.hsv = cv.cvtColor(self.image, cv.COLOR_BGR2HSV)
-		self.gray =cv.cvtoColor(self.image,cv.COLOR_BGR2GRAY)
+		self.gray =cv.cvtColor(self.image,cv.COLOR_BGR2GRAY)
 		lower_yellow=np.array([20,7,215])
 		upper_yellow=np.array([40,27,295])
 		mask=cv.inRange(self.hsv, lower_yellow, upper_yellow)
