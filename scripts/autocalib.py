@@ -34,3 +34,11 @@ class AUTOCALIB:
 			cv.circle(image, (circle[0], circle[1]), 2, (0, 0, 255), 3)    
 		cv.imshow("hsv",self.hsv)
 		cv.waitKey(3)
+
+		
+if __name__=="__main__":
+	print("Start")
+	rospy.init_node('follower')
+	autocalib = AUTOCALIB()
+#	follower.setOpenCVParams()
+	rospy.spin()
