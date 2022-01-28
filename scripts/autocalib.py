@@ -47,7 +47,7 @@ class AUTOCALIB:
 		# 円形の形状をしたピッキング・オブジェクトの座標を検出
 		result_obj = self.getCircle(1)
 		if isinstance(result_obj, np.ndarray):
-			obj_x, obj_y, obj_r = result_obj
+			self.obj_x, self.obj_y, self.obj_r = result_obj
 		
 		if self.isSetArm:
 			x, y, r = np.int16(np.around([self.arm_x, self.arm_y, self.arm_r]))
@@ -57,7 +57,7 @@ class AUTOCALIB:
 						(20, 450), cv.FONT_HERSHEY_PLAIN, 1.5, (0,255,255), 2)
 		
 		if self.isSetObj:
-			x, y, r = np.int16(np.around([obj_x, obj_y, obj_r]))
+			x, y, r = np.int16(np.around([self.obj_x, self.obj_y, self.obj_r]))
 			self.drawMark(x, y, r)
 		else:
 			cv.putText(self.image, "R-Click : Mark of Target",
