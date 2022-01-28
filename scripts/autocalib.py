@@ -26,8 +26,9 @@ class AUTOCALIB:
 
 		while not rospy.is_shutdown():
 			if self.RUN == 1:
-				print("run")
+				
 				time_duration = rospy.get_time() - self.last_clb_time_
+				print(time_duration)
 				if time_duration < self.TIMEOUT:
 					self.start_autocalib()
 
