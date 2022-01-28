@@ -122,7 +122,7 @@ def drawMark(frame, x, y, radius):
     cv2.circle(frame, (x, y), radius, (0, 0, 255), 2)
     
     # 中心点を描く
-    cv2.circle(frame, (x, y),      3, (255, 0, 0), 3)
+    cv2.circle(frame, (x, y), 3, (255, 0, 0), 3)
 
 
 # In[439]:
