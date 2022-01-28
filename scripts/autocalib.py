@@ -2,7 +2,6 @@
 # --*-- coding: utf-8 -*-
 
 import cv2 as cv
-from scripts.DobotOpenCV_DoVision import setOpenCVParams
 from sensor_msgs.msg import Image
 import rospy
 import cv_bridge
@@ -15,11 +14,13 @@ class AUTOCALIB:
 	def __init__(self):
 		print("__init__")
 		self.bridge = cv_bridge.CvBridge()
-		self.setDefault()
+
 		self.image_sub = rospy.Subscriber('/camera/color/image_raw', Image, self.image_callback)   #Image型で画像トピックを購読し，コールバック関数を呼ぶ				
 		self.start_srv_ = rospy.Service('/autocalib/start', Empty, self.clbk_start_service)
 		self.stop_srv_ = rospy.Service('/autocalib/stop', Empty, self.clbk_stop_service)
-
+	        self.hz = 20
+                self.RUN = 0
+                self.TIMEOUT = 0.5 
 		rate = rospy.Rate(self.hz)
 		self.last_clb_time_ = rospy.get_time()
 
@@ -30,7 +31,7 @@ class AUTOCALIB:
 				if time_duration < self.TIMEOUT:
 					self.start_autocalib()
 
-				self.pub_.publish(self.msg)
+				#self.pub_.publish(self.msg)
 				rate.sleep()
 	
 
@@ -112,6 +113,7 @@ class AUTOCALIB:
 	def clbk_start_service(self,req):
 		print("start autocalib follow")
 		self.RUN = 1
+                self.setDefault()
 		return EmptyResponse()
 
 
@@ -122,7 +124,7 @@ class AUTOCALIB:
 
 
 	def setDefault(self):
-		self.SCREEN_HEIGHT, self.SCREEN_WIDTH = self.frame.shape[:2]
+		self.SCREEN_HEIGHT, self.SCREEN_WIDTH = self.image.shape[:2]
 		self.setOpenCVParams()
 
 		self.AVERAGE_COUNT = 1
