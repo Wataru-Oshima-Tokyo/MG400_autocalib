@@ -107,7 +107,7 @@ class AUTOCALIB:
 					
 					# MOVJ：Joint Movements  [isQueued = False, 非同期モード]
 					# dType.SetPTPCmdEx(api, dType.PTPMode.PTPMOVJXYZINCMode, my, mx, 0, 0, False)
-		cv.waitKey(0)
+		cv.waitKey(3)
 
 
 
@@ -337,8 +337,8 @@ class AUTOCALIB:
 		# # 	cv.circle(self.image, (circle[0], circle[1]), circle[2], (0, 165, 255), 5)
 		# # 	# 中心点を描画する
 		# # 	cv.circle(self.image, (circle[0], circle[1]), 2, (0, 0, 255), 3)    
-		cv.imshow("hsv",self.image)
-		cv.waitKey(3)
+		#cv.imshow("hsv",self.image)
+		#cv.waitKey(3)
 
 
 if __name__=="__main__":
