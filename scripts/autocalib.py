@@ -313,6 +313,7 @@ class AUTOCALIB:
 
 
 	def image_callback(self, msg):
+		self.last_clb_time_ = rospy.get_time()
 		#print("I will write down codes below")
 		self.image = self.bridge.imgmsg_to_cv2(msg, desired_encoding = 'bgr8')
 		self.blur = cv.GaussianBlur(self.image, (33, 33), 1)
