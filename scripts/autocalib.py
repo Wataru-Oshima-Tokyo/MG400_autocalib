@@ -195,8 +195,8 @@ class AUTOCALIB:
 		bgr00 = bgr[0][0]
 		
 		print("RGB: ", bgr00)
-		
-		hsv00 = self.hsv[0][0]
+		hsv = cv.cvtColor(bgr, cv.COLOR_BGR2HSV_FULL)
+		hsv00 = hsv[0][0]
 		print("HSV: ", hsv00)
 		
 		#################################################################
@@ -315,7 +315,7 @@ class AUTOCALIB:
 		self.image = self.bridge.imgmsg_to_cv2(msg, desired_encoding = 'bgr8')
 		self.blur = cv.GaussianBlur(self.image, (33, 33), 1)
 		# now click into the hsv img , and look at values:
-		self.hsv = cv.cvtColor(self.image, cv.COLOR_BGR2HSV)
+		self.hsv = cv.cvtColor(self.image, cv.COLOR_BGR2HSV_FULL)
 		# self.gray =cv.cvtColor(self.image,cv.COLOR_BGR2GRAY)
 		# self.result = self.getCircle(0, self.hsv)
 		# lower_yellow=np.array([20,7,215])
