@@ -26,9 +26,7 @@ class AUTOCALIB:
 
 		while not rospy.is_shutdown():
 			if self.RUN == 1:
-				
 				time_duration = rospy.get_time() - self.last_clb_time_
-				print(time_duration)
 				if time_duration < self.TIMEOUT:
 					self.start_autocalib()
 
@@ -38,7 +36,6 @@ class AUTOCALIB:
 
 	def start_autocalib(self):
     		# マニピュレータのアームに貼り付けた円形マークの座標を検出
-		print("start autocalib")
  		cv.setMouseCallback("Dobot", self.mouseEvent)
 		result_arm = self.getCircle(0)
 		if isinstance(result_arm, np.ndarray):
