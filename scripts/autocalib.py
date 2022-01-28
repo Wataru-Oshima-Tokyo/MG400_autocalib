@@ -51,14 +51,14 @@ class AUTOCALIB:
 		
 		if self.isSetArm:
 			x, y, r = np.int16(np.around([arm_x, arm_y, arm_r]))
-			self.drawMark(self.image, x, y, r)
+			self.drawMark(x, y, r)
 		else:
 			cv.putText(self.image, "L-Click : Mark of Arm",
 						(20, 450), cv.FONT_HERSHEY_PLAIN, 1.5, (0,255,255), 2)
 		
 		if self.isSetObj:
 			x, y, r = np.int16(np.around([obj_x, obj_y, obj_r]))
-			self.drawMark(self.image, x, y, r)
+			self.drawMark(x, y, r)
 		else:
 			cv.putText(self.image, "R-Click : Mark of Target",
 						(20, 470), cv.FONT_HERSHEY_PLAIN, 1.5, (0,255,255), 2)
