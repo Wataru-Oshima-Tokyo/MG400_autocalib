@@ -190,14 +190,14 @@ class AUTOCALIB:
 			"MAX": [0, 0, 0]})
 
 	def setColorRange(self,index, x, y):
-		print("\tPOS: ", x, y)
+		print("POS: ", x, y)
 		bgr = self.image[y:y + 1, x:x + 1]
 		bgr00 = bgr[0][0]
 		
-		print("\tRGB: ", bgr00)
+		print("RGB: ", bgr00)
 		
 		hsv00 = self.hsv[0][0]
-		print("\tHSV: ", hsv00)
+		print("HSV: ", hsv00)
 		
 		#################################################################
 		#  HSV 空間における、指定色から最小値と最大値                   #
@@ -210,13 +210,13 @@ class AUTOCALIB:
 		self.CIRCLE_PARAMS[index]["MIN"][0] = max([0, hsv00[0] - MIN_DH])
 		self.CIRCLE_PARAMS[index]["MIN"][1] = max([0, hsv00[1] - MIN_DS])
 		self.CIRCLE_PARAMS[index]["MIN"][2] = max([0, hsv00[2] - MIN_DV])
-		print("\tMIN: ", np.array(self.CIRCLE_PARAMS[index]["MIN"]))
+		print("MIN: ", np.array(self.CIRCLE_PARAMS[index]["MIN"]))
 		
 		self.CIRCLE_PARAMS[index]["MAX"][0] = min([255, hsv00[0] + MAX_DH])
 		self.CIRCLE_PARAMS[index]["MAX"][1] = min([255, hsv00[1] + MAX_DS])
 		self.CIRCLE_PARAMS[index]["MAX"][2] = min([255, hsv00[2] + MAX_DV])
 
-		print("\tMAX: ", np.array(self.CIRCLE_PARAMS[index]["MAX"]))
+		print("MAX: ", np.array(self.CIRCLE_PARAMS[index]["MAX"]))
 
 
 	def getCircle(self,target_num):
