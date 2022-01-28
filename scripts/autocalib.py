@@ -42,7 +42,7 @@ class AUTOCALIB:
  		cv.setMouseCallback("Dobot", self.mouseEvent)
 		result_arm = self.getCircle(0)
 		if isinstance(result_arm, np.ndarray):
-			arm_x, arm_y, arm_r = result_arm
+			self.arm_x, self.arm_y, self.arm_r = result_arm
 		
 		# 円形の形状をしたピッキング・オブジェクトの座標を検出
 		result_obj = self.getCircle(1)
@@ -50,7 +50,7 @@ class AUTOCALIB:
 			obj_x, obj_y, obj_r = result_obj
 		
 		if self.isSetArm:
-			x, y, r = np.int16(np.around([arm_x, arm_y, arm_r]))
+			x, y, r = np.int16(np.around([self.arm_x, self.arm_y, self.arm_r]))
 			self.drawMark(x, y, r)
 		else:
 			cv.putText(self.image, "L-Click : Mark of Arm",
@@ -86,7 +86,7 @@ class AUTOCALIB:
 			# アームがピッキング・オブジェクトに十分重なって見えた場合
 			if dist2 < self.FIND_THRESHOLD:
 				# 視差により位置ずれの修正とピッキング
-				self.fineTuning(arm_x, arm_y, self.TUNING_SCALE_X, self.TUNING_SCALE_Y)
+				self.fineTuning(self.arm_x, self.arm_y, self.TUNING_SCALE_X, self.TUNING_SCALE_Y)
 				
 				# フラグを初期化
 				self.isSetArm = False
