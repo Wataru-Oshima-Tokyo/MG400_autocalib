@@ -38,7 +38,7 @@ class AUTOCALIB:
 	def start_autocalib(self):
     	# マニピュレータのアームに貼り付けた円形マークの座標を検出
 		print("start autocalib")
-# 		cv.setMouseCallback("Dobot", self.mouseEvent)
+ 		cv.setMouseCallback("Dobot", self.mouseEvent)
 		result_arm = self.getCircle(0)
 		if isinstance(result_arm, np.ndarray):
 			arm_x, arm_y, arm_r = result_arm
@@ -337,7 +337,7 @@ class AUTOCALIB:
 		# # 	cv.circle(self.image, (circle[0], circle[1]), circle[2], (0, 165, 255), 5)
 		# # 	# 中心点を描画する
 		# # 	cv.circle(self.image, (circle[0], circle[1]), 2, (0, 0, 255), 3)    
-		# cv.imshow("hsv",self.image)
+		cv.imshow("hsv",self.image)
 		cv.waitKey(3)
 
 
