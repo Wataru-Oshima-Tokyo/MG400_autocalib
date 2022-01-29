@@ -19,6 +19,8 @@ class MOVE:
 		self.suction = rospy.ServiceProxy('/bringup/srv/DO', DO)
 		self.sub = rospy.Subscriber("/autocalib/coordinate", Coordinate, self.move_callback)
 		self.pub_move = rospy.Publisher("/autocalib/move", Int16, queue_size=10)
+		self.start_srv_ = rospy.Service('/autocalib_work/start', Empty, self.clbk_start_service)
+		self.stop_srv_ = rospy.Service('/autocalib_work/stop', Empty, self.clbk_stop_service)
 		self.hz = 20
                 self.RUN = 0
                 self.TIMEOUT = 0.5
