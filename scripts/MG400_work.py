@@ -3,7 +3,7 @@
 
 import cv2 as cv
 from sensor_msgs.msg import Image
-from std_msgs.msg import Float64MultiArray, int16
+from std_msgs.msg import Float64MultiArray, Int16
 import rospy
 import cv_bridge
 import numpy as np
