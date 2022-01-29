@@ -3,7 +3,7 @@
 
 import cv2 as cv
 from sensor_msgs.msg import Image
-from std_msgs.msg import Float64MultiArray
+from std_msgs.msg import Float64MultiArray, int16
 import rospy
 import cv_bridge
 import numpy as np
@@ -14,7 +14,7 @@ class MOVE:
     def __init__(self):
         print("start MG400")
         self.sub = rospy.Subscriber("/autocalib/coordinate", Float64MultiArray, self.move_callback)
-        self.pub_move = rospy.Publisher("/autocalib/move", int, queue_size=10)
+        self.pub_move = rospy.Publisher("/autocalib/move", int16, queue_size=10)
 
     def move_callback(self, msg):
         print(msg)
