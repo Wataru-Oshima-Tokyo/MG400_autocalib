@@ -14,7 +14,7 @@ class MOVE:
     def __init__(self):
         print("start MG400")
         self.sub = rospy.Subscriber("/autocalib/coordinate", Float64MultiArray, self.move_callback)
-        self.pub_move = rospy.Publisher("/autocalib/move", int16, queue_size=10)
+        self.pub_move = rospy.Publisher("/autocalib/move", Int16, queue_size=10)
 
     def move_callback(self, msg):
         print(msg)
