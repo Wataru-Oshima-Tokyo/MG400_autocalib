@@ -16,6 +16,7 @@ class AUTOCALIB:
 		self.bridge = cv_bridge.CvBridge()
 
 		self.image_sub = rospy.Subscriber('/camera/color/image_raw', Image, self.image_callback)   #Image型で画像トピックを購読し，コールバック関数を呼ぶ				
+		self.pub_coordinate = rospy.Publsiher('autocalib/coordinate', Float64MultiArray, queue_size=10)
 		self.start_srv_ = rospy.Service('/autocalib/start', Empty, self.clbk_start_service)
 		self.stop_srv_ = rospy.Service('/autocalib/stop', Empty, self.clbk_stop_service)
 	        self.hz = 20
@@ -285,9 +286,13 @@ class AUTOCALIB:
 		return aveArray
 
 	def mouseEvent(self,event, x, y, flags, param):
+    	self.coordinate=[]
+		self.coordinate.append(x)
+		self.coordinate.append(y)
 		if event == cv.EVENT_LBUTTONUP:
 			print("\nL-Button: ARM")
 			self.setColorRange(0, x, y)
+			self.pub_coordinate.publish(self.coordinate)
 			self.isSetArm = True
 		
 		if event == cv.EVENT_RBUTTONUP:

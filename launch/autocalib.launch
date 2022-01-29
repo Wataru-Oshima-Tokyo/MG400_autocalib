@@ -1,9 +1,13 @@
 <launch>
     <include file="$(find realsense2_camera)/launch/rs_camera.launch"></include>
     
-    <node name="MG400_autocalib"
+    <node name="MG400_autocalb_image"
         pkg="MG400_autocalib"
         type="autocalib.py"
+        output="screen"/>
+    <node name="MG400_autocalib_move"
+        pkg="MG400_autocalib"
+        type="MG400_work.py"
         output="screen"/>
                                     
 </launch>
