@@ -1,4 +1,9 @@
 <launch>
+    
+    <include file="$(find bringup)/launch/bringup.launch">
+        <param name="~robot_ip"         type="string"   value="192.168.1.6"/>
+    </include>    
+     
     <include file="$(find realsense2_camera)/launch/rs_camera.launch"></include>
     
     <node name="MG400_autocalb_image"
