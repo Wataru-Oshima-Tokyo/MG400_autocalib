@@ -3,6 +3,7 @@
 
 import cv2 as cv
 from sensor_msgs.msg import Image
+from std_msgs.msg import Float64MultiArray
 import rospy
 import cv_bridge
 import numpy as np
@@ -16,7 +17,7 @@ class AUTOCALIB:
 		self.bridge = cv_bridge.CvBridge()
 
 		self.image_sub = rospy.Subscriber('/camera/color/image_raw', Image, self.image_callback)   #Image型で画像トピックを購読し，コールバック関数を呼ぶ				
-		self.pub_coordinate = rospy.Publsiher('autocalib/coordinate', Float64MultiArray, queue_size=10)
+		self.pub_coordinate = rospy.Publisher('autocalib/coordinate', Float64MultiArray, queue_size=10)
 		self.start_srv_ = rospy.Service('/autocalib/start', Empty, self.clbk_start_service)
 		self.stop_srv_ = rospy.Service('/autocalib/stop', Empty, self.clbk_stop_service)
 	        self.hz = 20
