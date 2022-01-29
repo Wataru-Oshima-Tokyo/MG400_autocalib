@@ -5,6 +5,7 @@
         pkg="MG400_autocalib"
         type="autocalib.py"
         output="screen"/>
+        
     <node name="MG400_autocalib_move"
         pkg="MG400_autocalib"
         type="MG400_work.py"
