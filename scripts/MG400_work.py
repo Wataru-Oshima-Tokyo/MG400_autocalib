@@ -19,7 +19,7 @@ class MOVE:
     def move_callback(self, msg):
         print(msg)
 if __name__ == "__main__":
-    print("MG400_work start")
+	print("MG400_work start")
 	rospy.init_node('MG400_work')
-    mv = MOVE()
-    rospy.spin()
+	mv = MOVE()
+	rospy.spin()
