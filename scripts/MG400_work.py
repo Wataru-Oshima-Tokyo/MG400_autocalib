@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# --*-- coding: utf-8 -*-
+
 import cv2 as cv
 from sensor_msgs.msg import Image, String
 import rospy
