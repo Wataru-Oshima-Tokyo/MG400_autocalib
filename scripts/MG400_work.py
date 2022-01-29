@@ -2,7 +2,7 @@
 # --*-- coding: utf-8 -*-
 
 import cv2 as cv
-from sensor_msgs.msg import Image, String
+from sensor_msgs.msg import Image, Float64MultiArray
 import rospy
 import cv_bridge
 import numpy as np
