@@ -3,7 +3,7 @@
 
 import cv2 as cv
 from sensor_msgs.msg import Image
-from std_msgs.msg import Float64MultiArray
+from MG400_autocalib.msg import Coordinate
 import rospy
 import cv_bridge
 import numpy as np
@@ -17,12 +17,13 @@ class AUTOCALIB:
 		self.bridge = cv_bridge.CvBridge()
 
 		self.image_sub = rospy.Subscriber('/camera/color/image_raw', Image, self.image_callback)   #Image型で画像トピックを購読し，コールバック関数を呼ぶ				
-		self.pub_coordinate = rospy.Publisher('autocalib/coordinate', Float64MultiArray, queue_size=10)
+		self.pub_coordinate = rospy.Publisher('/autocalib/coordinate', Coordinate, queue_size=10)
 		self.start_srv_ = rospy.Service('/autocalib/start', Empty, self.clbk_start_service)
 		self.stop_srv_ = rospy.Service('/autocalib/stop', Empty, self.clbk_stop_service)
 	        self.hz = 20
                 self.RUN = 0
-                self.TIMEOUT = 0.5 
+                self.coordinate_msg = Coordinate()
+                self.TIMEOUT = 0.5
 		rate = rospy.Rate(self.hz)
 		self.last_clb_time_ = rospy.get_time()
 
@@ -287,13 +288,12 @@ class AUTOCALIB:
 		return aveArray
 
 	def mouseEvent(self,event, x, y, flags, param):
-    		self.coordinate=[]
-		self.coordinate.append(x)
-		self.coordinate.append(y)
+    		self.coordinate_msg.x = x
+                self.coordinate_msg.y = y
 		if event == cv.EVENT_LBUTTONUP:
 			print("\nL-Button: ARM")
 			self.setColorRange(0, x, y)
-			self.pub_coordinate.publish(self.coordinate)
+			self.pub_coordinate.publish(self.coordinate_msg)
 			self.isSetArm = True
 		
 		if event == cv.EVENT_RBUTTONUP:
