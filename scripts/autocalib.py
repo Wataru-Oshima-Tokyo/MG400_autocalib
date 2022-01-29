@@ -286,7 +286,7 @@ class AUTOCALIB:
 		return aveArray
 
 	def mouseEvent(self,event, x, y, flags, param):
-    	self.coordinate=[]
+    		self.coordinate=[]
 		self.coordinate.append(x)
 		self.coordinate.append(y)
 		if event == cv.EVENT_LBUTTONUP:
