@@ -236,7 +236,7 @@ class AUTOCALIB:
 		print("radius: ", radius)
 		'''
 		
-		hough = self.CIRCLE_PARAMS[target_num]["HOUGH"]
+		hough = self.CIRCLE_PARAMS[target_num][" f"]
 		
 		# ハフ変換を用いて，グレースケール画像から円を検出する。
 		# 検出された円はベクトル形式で出力される。
@@ -313,7 +313,7 @@ class AUTOCALIB:
 		self.last_clb_time_ = rospy.get_time()
 		#print("I will write down codes below")
 		self.image = self.bridge.imgmsg_to_cv2(msg, desired_encoding = 'bgr8')
-		self.blur = cv.GaussianBlur(self.image, (33, 33), 1)
+# 		# self.blur = cv.GaussianBlur(self.image, (33, 33), 1)
 		# now click into the hsv img , and look at values:
 		self.hsv = cv.cvtColor(self.image, cv.COLOR_BGR2HSV_FULL)
 		# self.gray =cv.cvtColor(self.image,cv.COLOR_BGR2GRAY)
