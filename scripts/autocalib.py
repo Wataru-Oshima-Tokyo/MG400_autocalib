@@ -236,7 +236,7 @@ class AUTOCALIB:
 		print("radius: ", radius)
 		'''
 		
-		hough = self.CIRCLE_PARAMS[target_num][" f"]
+		hough = self.CIRCLE_PARAMS[target_num]["HOUGH"]
 		
 		# ハフ変換を用いて，グレースケール画像から円を検出する。
 		# 検出された円はベクトル形式で出力される。
