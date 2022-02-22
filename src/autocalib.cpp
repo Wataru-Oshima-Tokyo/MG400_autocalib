@@ -13,7 +13,8 @@
  #include <sensor_msgs/image_encodings.h>
  #include <vector>
  #include <map>
- #define IMG_HEIGHT (240)
+ #include <bringup/robot.h>
+#define IMG_HEIGHT (240)
  #define IMG_WIDTH (320)
  #define rep(i,a,b) for(int i=a;i<b;i++)
  #define fore(i,a) for(auto &i:a)

@@ -4,7 +4,7 @@
 import cv2 as cv
 from sensor_msgs.msg import Image
 from std_msgs.msg import Int16
-from MG400_autocalib.msg import Coordinate
+from camera_pkg.msg import Coordinate
 import rospy
 import cv_bridge
 import numpy as np
@@ -19,7 +19,7 @@ class MOVE:
 		self.arm_enable = rospy.ServiceProxy('/bringup/srv/EnableRobot',EnableRobot)
                 self.arm_disable = rospy.ServiceProxy('/bringup/srv/DisableRobot',DisableRobot)
 		self.suction = rospy.ServiceProxy('/bringup/srv/DO', DO)
-		self.sub = rospy.Subscriber("/autocalib/coordinate", Coordinate, self.move_callback)
+		self.sub = rospy.Subscriber("/camera_pkg/coordinate", Coordinate, self.move_callback)
 		self.pub_move = rospy.Publisher("/autocalib/move", Int16, queue_size=10)
 		self.start_srv_ = rospy.Service('/autocalib_work/start', Empty, self.clbk_start_service)
 		self.stop_srv_ = rospy.Service('/autocalib_work/stop', Empty, self.clbk_stop_service)
@@ -28,24 +28,41 @@ class MOVE:
                 self.TIMEOUT = 0.5
 		rate = rospy.Rate(self.hz)
 		self.last_clb_time_ = rospy.get_time()
+		self.pos_x =0
+		self.pos_y =0
 		while not rospy.is_shutdown():
 			if self.RUN == 1:
 				time_duration = rospy.get_time() - self.last_clb_time_
 				if time_duration < self.TIMEOUT:
-					self.move_loop()
-
+					#self.move_loop()
+                                        pass
 				rate.sleep()
 
-
 	def move_callback(self, msg):
-		print(msg.x, msg.y)
+		#initial postion for MG400 in image coordinate is 566(x),145(y) and robot coordination is (300, 0)
+		#from left to center, (332,145) and robot (300, 113)
+		if msg.t =="L":
+			self.pos_y= msg.x /3
+			self.arm_move(self.pos_x, self.pos_y, 0, 0, 0, 0)
+		elif msg.t =="R":
+			self.pos_y-= -msg.x /3
+			self.arm_move(self.pos_x, self.pos_y, 0, 0, 0, 0)
+		elif msg.t =="M":
+			self.pos_x=300
+			self.pos_y=0
+			self.arm_move(self.pos_x, self.pos_y, 0, 0, 0, 0)
+
+		# self.arm_move(pos_x, pos_y, 0, 0, 0, 0)
+        	time.sleep(0.1)
+		self.last_clb_time_ = rospy.get_time()
 
 
 	def clbk_start_service(self,req):
 		print("start movement ")
 		self.RUN = 1
                 self.arm_enable()
-		first_move = self.arm_move(300, 0, 0, 0, 0, 0)
+		self.pos_x =300
+		first_move = self.arm_move(self.pos_x, 0, 0, 0, 0, 0)
 		time.sleep(1)
                 self.last_clb_time_ = rospy.get_time()
 		return EmptyResponse()
