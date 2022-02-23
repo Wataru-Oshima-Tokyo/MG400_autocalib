@@ -14,6 +14,5 @@ rosrun MG400_autocalib MG400_work.py
 ```
 ### Start 
 ```
-rosservice call /autocalib/start
-rosservice call /
+rosservice call /mg_work/start
 ```
