@@ -4,6 +4,7 @@
 import cv2 as cv
 from sensor_msgs.msg import Image
 from std_msgs.msg import Int16
+from geometry_msgs.msg import Twist
 from camera_pkg.msg import Coordinate
 import rospy
 import cv_bridge
@@ -22,6 +23,7 @@ class MOVE:
 		self.sub = rospy.Subscriber("/camera_pkg/coordinate", Coordinate, self.move_callback)
 		self.pub_move = rospy.Publisher("/autocalib/move", Int16, queue_size=10)
 		self.start_srv_ = rospy.Service('/autocalib_work/start', Empty, self.clbk_start_service)
+		self.twist_pub = rospy.Subscriber('/cmd_vel', Twist, self.twist_callback)
 		self.stop_srv_ = rospy.Service('/autocalib_work/stop', Empty, self.clbk_stop_service)
 		self.hz = 20
                 self.RUN = 0
@@ -37,6 +39,14 @@ class MOVE:
 					#self.move_loop()
                                         pass
 				rate.sleep()
+
+	def twist_callback(self, msg):
+		if msg.angular.z>0:
+			self.pos_y += msg.linear.x
+		else:
+			self.pos_y -= msg.linear.x
+		self.pos_y += msg.angular.z
+		self.arm_move(self.pos_x, self.pos_y, 0, 0, 0, 0)
 
 	def move_callback(self, msg):
 		#initial postion for MG400 in image coordinate is 566(x),145(y) and robot coordination is (300, 0)
@@ -74,15 +84,15 @@ class MOVE:
                 self.arm_disable()
 		return EmptyResponse()
 	
-	def move_loop(self):
-                init_pos_x = 200
-                init_pos_y = 0
-                for i in range(10):
-                    pos_x = init_pos_x + 10*i
-                    pos_y = init_pos_y + 10*i
-                    self.arm_move(pos_x, pos_y, 0, 0, 0, 0)
-                    time.sleep(1)
-                self.last_clb_time_ = rospy.get_time()
+	# def move_loop(self):
+    #             init_pos_x = 200
+    #             init_pos_y = 0
+    #             for i in range(10):
+    #                 pos_x = init_pos_x + 10*i
+    #                 pos_y = init_pos_y + 10*i
+    #                 self.arm_move(pos_x, pos_y, 0, 0, 0, 0)
+    #                 time.sleep(1)
+    #             self.last_clb_time_ = rospy.get_time()
 
 
 

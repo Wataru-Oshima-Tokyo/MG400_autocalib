@@ -12,10 +12,13 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   sensor_msgs
+  geometry_msgs
   message_generation
   cv_bridge
   image_transport
   bringup
+  #camera_pkg
+  #opencv2
   )
   #find_package(OpenCV 3 REQUIRED)
   find_package(OpenCV 4 REQUIRED)
@@ -153,6 +156,9 @@ include_directories(
 
 add_executable(autocalib src/autocalib.cpp)
 target_link_libraries(autocalib ${OpenCV_LIBRARIES} ${catkin_LIBRARIES} )
+
+add_executable(mg_work src/mg_work.cpp)
+target_link_libraries(mg_work ${OpenCV_LIBRARIES} ${catkin_LIBRARIES} )
 
 ## Specify libraries to link a library or executable target against
 # target_link_libraries(${PROJECT_NAME}_node
