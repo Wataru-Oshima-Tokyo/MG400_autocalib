@@ -18,8 +18,9 @@ public:
     ros::ServiceServer arm_enable, arm_disable, arm_move;
     bool getRun();
     void TwistCallBack(const geometry_msgs::Twist& msg);
-    virtual bool clbk_start_service(roscpp_tutorials::TwoInts::Request& req,roscpp_tutorials::TwoInts::Response& res);
-    virtual bool clbk_stop_service(roscpp_tutorials::TwoInts::Request& req, roscpp_tutorials::TwoInts::Response& res);
+    virtual bool image_start_service(roscpp_tutorials::TwoInts::Request& req,roscpp_tutorials::TwoInts::Response& res);
+    virtual bool image_stop_service(roscpp_tutorials::TwoInts::Request& req, roscpp_tutorials::TwoInts::Response& res);
+    
     //topics 
     const std::string SERVICE_START = "/mg_work/start";
     const std::string SERVICE_STOP = "/mg_work/stop";
@@ -34,7 +35,9 @@ private:
 
 };
 
- bool RobotMove::clbk_start_service(roscpp_tutorials::TwoInts::Request& req,roscpp_tutorials::TwoInts::Response& res){
+
+ 
+ bool RobotMove::image_start_service(roscpp_tutorials::TwoInts::Request& req,roscpp_tutorials::TwoInts::Response& res){
    cout << "robot start" << endl;
 //    CR5 en(nh, "enable");
 //    bringup::EnableRobot::Request _req;
@@ -46,7 +49,7 @@ private:
 
  }
 
- bool RobotMove::clbk_stop_service(roscpp_tutorials::TwoInts::Request& req,roscpp_tutorials::TwoInts::Response& res){
+ bool RobotMove::image_stop_service(roscpp_tutorials::TwoInts::Request& req,roscpp_tutorials::TwoInts::Response& res){
    cout << "robot stop" << endl;
    RUN = false;
    
