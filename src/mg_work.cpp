@@ -18,8 +18,8 @@ public:
     ros::ServiceServer arm_enable, arm_disable, arm_move;
     bool getRun();
     void TwistCallBack(const geometry_msgs::Twist& msg);
-    virtual bool image_start_service(roscpp_tutorials::TwoInts::Request& req,roscpp_tutorials::TwoInts::Response& res);
-    virtual bool image_stop_service(roscpp_tutorials::TwoInts::Request& req, roscpp_tutorials::TwoInts::Response& res);
+    virtual bool robot_start_service(roscpp_tutorials::TwoInts::Request& req,roscpp_tutorials::TwoInts::Response& res);
+    virtual bool robot_stop_service(roscpp_tutorials::TwoInts::Request& req, roscpp_tutorials::TwoInts::Response& res);
     
     //topics 
     const std::string SERVICE_START = "/mg_work/start";
@@ -37,25 +37,16 @@ private:
 
 
  
- bool RobotMove::image_start_service(roscpp_tutorials::TwoInts::Request& req,roscpp_tutorials::TwoInts::Response& res){
+ bool RobotMove::robot_start_service(roscpp_tutorials::TwoInts::Request& req,roscpp_tutorials::TwoInts::Response& res){
    cout << "robot start" << endl;
-//    CR5 en(nh, "enable");
-//    bringup::EnableRobot::Request _req;
-//    bringup::EnableRobot::Response _res;
-//    en.enableRobot(_req,_res);
-  //  CR5Commander mg("192.168.1.6");
    RUN = true;
    return RUN;
 
  }
 
- bool RobotMove::image_stop_service(roscpp_tutorials::TwoInts::Request& req,roscpp_tutorials::TwoInts::Response& res){
+ bool RobotMove::robot_stop_service(roscpp_tutorials::TwoInts::Request& req,roscpp_tutorials::TwoInts::Response& res){
    cout << "robot stop" << endl;
    RUN = false;
-   
-//    bringup::EnableRobot::Request _req;
-//    bringup::EnableRobot::Response _res;
-//    dn(_req,_res);
    return RUN;
  }
 
@@ -81,8 +72,8 @@ int main(int argc, char** argv){
     bringup::EnableRobot en;
     // bringup::DisableRobot dn;
     rm.sub = rm.nh.subscribe("cmd_vel",1000,&RobotMove::TwistCallBack, &rm);
-    rm.start = rm.nh.advertiseService(rm.SERVICE_START, &RobotMove::clbk_start_service, &rm);
-    rm.stop = rm.nh.advertiseService(rm.SERVICE_STOP, &RobotMove::clbk_stop_service, &rm);
+    rm.start = rm.nh.advertiseService(rm.SERVICE_START, &RobotMove::robot_start_service, &rm);
+    rm.stop = rm.nh.advertiseService(rm.SERVICE_STOP, &RobotMove::robot_stop_service, &rm);
     // rm.arm_enable = rm.nh.advertiseService(rm.SERVICE_STOP, &bringup::EnableRobot::enableRobot, &en);
     // rm.arm_enable = rm.nh.advertiseService('/bringup/srv/EnableRobot',&MG400Robot::enableRobot, &robot);
     while(ros::ok()){
