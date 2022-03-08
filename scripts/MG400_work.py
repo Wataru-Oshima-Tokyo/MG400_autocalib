@@ -50,43 +50,41 @@ class MOVE:
 		self.x_r_arr =[]
 		self.y_r_arr =[]
 		self.z_r_arr =[]
+		self.x_r_intercept = 0
+		self.y_r_intercept = 0
+		self.z_r_coefficient = 0
+		self.z_r_intercept = 0
+		self.x_r_coefficient = [0,0,0]
+		self.y_r_coefficient = [0,0,0]
 		self.readCalibFile()
 
-		while not rospy.is_shutdown():
-			if self.RUN == 1:
-				time_duration = rospy.get_time() - self.last_clb_time_
-				if time_duration < self.TIMEOUT:
-					#self.move_loop()
-                                        pass
-				rate.sleep()
+
 
 	def readCalibFile(self):
 		try:
 			with open(self.filepath,"r") as file:	
-				temp = file.read()
-			temp = temp.split(",")
-			print(temp)
-			self.xx_coefficient = float(temp[0])
-			self.xy_coefficient = float(temp[1])
-			self.xz_coefficient = float(temp[2])
-			self.x_intercept = float(temp[3])
-			self.yx_coefficient = float(temp[4])
-			self.yy_coefficient = float(temp[5])
-			self.yz_coefficient = float(temp[6])
-			self.y_intercept = float(temp[7])
-			self.z_coefficient = float(temp[8])
-			self.z_intercept = float(temp[9])
-		except:
-			self.xx_coefficient = 0
-			self.xy_coefficient = 0
-			self.xz_coefficient = 0
-			self.x_intercept = 0
-			self.yx_coefficient = 0
-			self.yy_coefficient = 0
-			self.yz_coefficient = 0
-			self.y_intercept = 0
-			self.z_coefficient = 0
-			self.z_intercept = 0
+				line = file.read()
+			line = line.split("\n")
+			print(line)
+			for i in range(len(line)):
+				word = line[i].split(",")
+				print(word)
+				if i==0:
+					for j in range(len(word)-1):
+						self.x_r_coefficient[j] = float(word[j])
+					self.x_r_intercept = float(word[-1])
+				elif i ==1:
+					for j in range(len(word)-1):
+						self.y_r_coefficient[j] = float(word[j])
+					self.y_r_intercept = float(word[-1])
+				else:
+					self.z_r_coefficient = float(word[0])
+					self.z_r_intercept = float(word[1])
+				print("done reading calib file ")
+		except Exception as e:
+			print(e)
+			
+
 			
 
 	def robotCoordinate_callback(self, coordinate):
@@ -118,9 +116,19 @@ class MOVE:
 				pass
 		else:
 			if msg.t =="L":
-				x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
-				y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
+				msgs = [msg.x, msg.y, msg.z]
+				x_a, y_a =0,0
+				for i in range(len(self.x_r_coefficient)):
+					x_a += msgs[i]*self.x_r_coefficient[i]
+					y_a += msgs[i]*self.y_r_coefficient[i]
+				x_a += self.x_r_intercept
+				y_a += self.y_r_intercept
+				z_a = msg.z*self.z_r_coefficient + self.z_r_intercept+170
+				# x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
+				# y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
 				self.arm_move(x_a,y_a, 0, 0, 0, 0)
+				time.sleep(1)
+				self.arm_move(x_a,y_a,z_a, 0, 0, 0)
 			elif msg.t =="R":
 				self.cancelAppend()
 			elif msg.t =="M":
@@ -132,14 +140,12 @@ class MOVE:
 
 	def cancelAppend(self):
 		print("cancel")
-		# self.x_i_arr.pop(-1)
-		# self.y_i_arr.pop(-1)
-		# self.x_r_arr.pop(-1)
-		# self.y_r_arr.pop(-1)
+
 
 	def addCoordinate(self):
 		if self.x_r != 0  and self.y_r !=0 and self.z_r !=0:
 			pose =np.array([[self.x_i, self.y_i, self.z_i]])
+			# pose =np.array([[self.x_i, self.y_i]])
 			z_coordiante = np.array([self.z_i])
 			if self.camera_coordinate.size ==0:
 				self.camera_coordinate = pose
@@ -155,6 +161,7 @@ class MOVE:
 		else:
 			pass
 
+
 	def calibration(self):
 		self.camera_z = self.camera_z.reshape(-1,1)
 		print(self.camera_z)
@@ -163,14 +170,12 @@ class MOVE:
 		self.z_coefficient = LinearRegression().fit(self.camera_z, self.z_r_arr)
 		print(self.x_coefficient.coef_, self.x_coefficient.intercept_ , self.y_coefficient.coef_, self.y_coefficient.intercept_, self.z_coefficient.coef_, self.z_coefficient.intercept_)
 		with open(self.filepath,"w+") as file:
-			file.write(str(self.x_coefficient.coef_[0])+',')
-			file.write(str(self.x_coefficient.coef_[1])+',')
-			file.write(str(self.x_coefficient.coef_[2])+',')
-			file.write(str(self.x_coefficient.intercept_)+',')
-			file.write(str(self.y_coefficient.coef_[0])+',')
-			file.write(str(self.y_coefficient.coef_[1])+',')
-			file.write(str(self.y_coefficient.coef_[2])+',')
-			file.write(str(self.y_coefficient.intercept_)+',')
+			for i in range(len(self.x_coefficient.coef_)):
+				file.write(str(self.x_coefficient.coef_[i])+',')
+			file.write(str(self.x_coefficient.intercept_)+'\n')
+			for i in range(len(self.y_coefficient.coef_)):
+				file.write(str(self.y_coefficient.coef_[i])+',')
+			file.write(str(self.y_coefficient.intercept_)+'\n')
 			file.write(str(self.z_coefficient.coef_[0])+',')
 			file.write(str(self.z_coefficient.intercept_))
 		self.readCalibFile()
