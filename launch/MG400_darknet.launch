@@ -26,8 +26,7 @@
 	  <arg name="ordered_pc"                default="true"/>
 	  <arg name="enable_sync"               default="true"/>
 	  <arg name="align_depth"               default="true"/>
-	</include>
-    <include file="$(find darknet_ros)/launch/darknet_ros.launch"/>
+     </include>
   <!--node name="specific_object" pkg="darknet_ros" type="specific_object"/-->
     <node name="MG400_autocalib_move"
         pkg="MG400_autocalib"
