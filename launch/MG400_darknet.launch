@@ -27,5 +27,6 @@
 	  <arg name="enable_sync"               default="true"/>
 	  <arg name="align_depth"               default="true"/>
 	</include>
-  
+    <include file="$(find darknet_ros)/launch/darknet_ros.launch"/>
+  <!--node name="specific_object" pkg="darknet_ros" type="specific_object"/-->
 </launch>
