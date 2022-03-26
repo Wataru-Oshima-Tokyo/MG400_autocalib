@@ -15,7 +15,8 @@
     <include file="$(find realsense2_camera)/launch/rs_camera.launch">
 	  <arg name="align_depth"               default="true"/>
      </include>
-  <!--node name="specific_object" pkg="darknet_ros" type="specific_object"/-->
+	<include file="$(find darknet_ros)/launch/darknet_ros.launch">
+  <node name="specific_object" pkg="darknet_ros" type="specific_object"/>
     <node name="MG400_autocalib_move"
         pkg="MG400_autocalib"
         type="MG400_work_automatic.py"
