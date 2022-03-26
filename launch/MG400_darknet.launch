@@ -13,18 +13,6 @@
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
     
     <include file="$(find realsense2_camera)/launch/rs_camera.launch">
-      <arg name="depth_width"         default="640"/>
-      <arg name="depth_height"        default="480"/>
-      <arg name="enable_depth"        default="true"/>
-      <arg name="color_width"         default="640"/>
-      <arg name="color_height"        default="480"/>
-      <arg name="enable_color"        default="true"/> 
-      <arg name="enable_pointcloud"         default="true"/>
-	  <arg name="pointcloud_texture_stream" default="RS2_STREAM_COLOR"/>
-	  <arg name="pointcloud_texture_index"  default="0"/>
-	  <arg name="allow_no_texture_points"   default="true"/>
-	  <arg name="ordered_pc"                default="true"/>
-	  <arg name="enable_sync"               default="true"/>
 	  <arg name="align_depth"               default="true"/>
      </include>
   <!--node name="specific_object" pkg="darknet_ros" type="specific_object"/-->
