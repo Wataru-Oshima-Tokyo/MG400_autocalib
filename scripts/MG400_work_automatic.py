@@ -22,8 +22,8 @@ class MOVE:
 		self.filepath ="/home/woshima/catkin_ws/src/MG400_autocalib/calibration.txt"
 		self.arm_move =rospy.ServiceProxy('/bringup/srv/MovJ',MovJ)
 		self.arm_enable = rospy.ServiceProxy('/bringup/srv/EnableRobot',EnableRobot)
-        self.linetrace_stop = rospy.ServiceProxy('/linetrace/stop',Empty)
-        self.linetrace_start = rospy.ServiceProxy('/linetrace/start',Empty)
+                self.linetrace_stop = rospy.ServiceProxy('/linetrace/stop',Empty)
+                self.linetrace_start = rospy.ServiceProxy('/linetrace/start',Empty)
 		self.robot_coordinate = rospy.Subscriber("/bringup/msg/ToolVectorActual", ToolVectorActual, self.robotCoordinate_callback)
                 self.arm_disable = rospy.ServiceProxy('/bringup/srv/DisableRobot',DisableRobot)
 		self.suction = rospy.ServiceProxy('/bringup/srv/DO', DO)
@@ -38,7 +38,7 @@ class MOVE:
 		self.camera_coordinate =np.array([[]])
 		self.calib = False
 		self.hz = 20
-        self.move_stopper= True
+                self.move_stopper= True
 		self.camera_z = np.array([[]])
                 self.RUN = 0
                 self.TIMEOUT = 0.5
@@ -103,26 +103,26 @@ class MOVE:
 		self.y_r += msg.angular.z
 		self.arm_move(self.x_r, self.y_r, 0, 0, 0, 0)
 
-    def image_callback(self, msg):
-        if self.move_stopper:
-            self.linetrace_stop()
-            self.move_stopper =False
-            msgs = [msg.x, msg.y, msg.z]
-            x_a, y_a =0,0
-            for i in range(len(self.x_r_coefficient)):
-                x_a += msgs[i]*self.x_r_coefficient[i]
-                y_a += msgs[i]*self.y_r_coefficient[i]
-            x_a += self.x_r_intercept
-            y_a += self.y_r_intercept
-            z_a = msg.z*self.z_r_coefficient + self.z_r_intercept+170
-            # x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
-            # y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
-            self.arm_move(x_a,y_a, 0, 0, 0, 0)
-            time.sleep(1)
-            self.arm_move(x_a,y_a,z_a, 0, 0, 0)
-            time.sleep(1)
-            self.move_stopper =True
-            self.linetrace_start()
+        def image_callback(self, msg):
+            if self.move_stopper:
+                self.linetrace_stop()
+                self.move_stopper =False
+                msgs = [msg.x, msg.y, msg.z]
+                x_a, y_a =0,0
+                for i in range(len(self.x_r_coefficient)):
+                    x_a += msgs[i]*self.x_r_coefficient[i]
+                    y_a += msgs[i]*self.y_r_coefficient[i]
+                x_a += self.x_r_intercept
+                y_a += self.y_r_intercept
+                z_a = msg.z*self.z_r_coefficient + self.z_r_intercept+170
+                # x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
+                # y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
+                self.arm_move(x_a,y_a, 0, 0, 0, 0)
+                time.sleep(1)
+                self.arm_move(x_a,y_a,z_a, 0, 0, 0)
+                time.sleep(1)
+                self.move_stopper =True
+                self.linetrace_start()
 
 		# self.last_clb_time_ = rospy.get_time()
 
