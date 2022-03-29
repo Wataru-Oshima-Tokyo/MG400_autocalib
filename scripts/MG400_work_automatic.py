@@ -112,7 +112,7 @@ class MOVE:
 		self.now = time.time()
 # 		print("now ", self.now)
 # 		print("end ", self.end)
-		if not self.move_stopper:
+		if not self.move_stopper and msg.x !=0 and msg.y !=0:
 			if self.end > self.now:
 				pass
 			else:
@@ -131,7 +131,7 @@ class MOVE:
 				self.arm_move(x_a,y_a, 0, 0, 0, 0)
 				print("move to", x_a, y_a)
 		#                 self.arm_move(x_a,y_a,z_a, 0, 0, 0)
-				self.arm_disable()
+# 				self.arm_disable()
 				self.move_stopper =True
 #                 self.linetrace_start()
 
