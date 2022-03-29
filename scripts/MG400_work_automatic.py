@@ -107,6 +107,7 @@ class MOVE:
             if self.move_stopper:
 #                 self.linetrace_stop()
                 self.move_stopper =False
+		self.work_start_service(Empty)
                 msgs = [msg.x, msg.y, msg.z]
                 x_a, y_a =0,0
                 for i in range(len(self.x_r_coefficient)):
