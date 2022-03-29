@@ -66,6 +66,7 @@ class MOVE:
 		self.readCalibFile()
 		self.set_SpeedJ(100)
 		self.set_AccJ(100)
+		self.arm_move(4.20, -250, 30, 0, 0, 0)
 
 
 
@@ -134,6 +135,7 @@ class MOVE:
 				self.arm_move(x_a,y_a, 50, 0, 0, 0)
 				print("move to", x_a, y_a)
 		#                 self.arm_move(x_a,y_a,z_a, 0, 0, 0)
+				self.arm_move(300, 0, 30, 0, 0, 0)
 				self.arm_move(4.20, -250, 30, 0, 0, 0)
 #                 self.linetrace_start()
 
