@@ -121,7 +121,7 @@ class MOVE:
                 self.arm_move(x_a,y_a, 0, 0, 0, 0)
                 time.sleep(1)
 #                 self.arm_move(x_a,y_a,z_a, 0, 0, 0)
-                time.sleep(1)
+                time.sleep(10)
                 self.move_stopper =True
 #                 self.linetrace_start()
 
