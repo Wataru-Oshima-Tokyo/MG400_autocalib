@@ -36,8 +36,8 @@ class MOVE:
 		self.calib_stop_srv = rospy.Service('/calibration/stop', Empty, self.calib_stop_service)
 		self.sub_jointState = rospy.Subscriber('/bringup/srv/ok', Twist, self.twist_callback)
 		self.camera_coordinate =np.array([[]])
-		self.now =rospy.get_rostime()
-		self.end = rospy.get_rostime()
+		self.now = time.time()
+		self.end = time.time()
 		self.calib = False
 		self.hz = 20
                 self.move_stopper= True
@@ -110,12 +110,12 @@ class MOVE:
 #                 self.linetrace_stop()
                 self.move_stopper =False
 		print("get the message")
-		self.now = rospy.get_rostime()
+		self.now = time.time()
 		if not self.move_stopper:
 			if self.end > self.now:
 				pass
 			else:
-				self.end = rospy.get_rostime() + rospy.Duration(10)
+				self.end = time.time() +10
 				self.arm_move(300, 0, 0, 0, 0, 0)
 				msgs = [msg.x, msg.y, msg.z]
 				x_a, y_a =0,0
