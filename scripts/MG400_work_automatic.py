@@ -105,7 +105,7 @@ class MOVE:
 
         def image_callback(self, msg):
             if self.move_stopper:
-                self.linetrace_stop()
+#                 self.linetrace_stop()
                 self.move_stopper =False
                 msgs = [msg.x, msg.y, msg.z]
                 x_a, y_a =0,0
@@ -122,7 +122,7 @@ class MOVE:
                 self.arm_move(x_a,y_a,z_a, 0, 0, 0)
                 time.sleep(1)
                 self.move_stopper =True
-                self.linetrace_start()
+#                 self.linetrace_start()
 
 		# self.last_clb_time_ = rospy.get_time()
 
