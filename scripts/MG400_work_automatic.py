@@ -107,17 +107,16 @@ class MOVE:
 
         def image_callback(self, msg):
 	#                 self.linetrace_stop()
-		self.move_stopper =False
 # 		print("get the message")
 		self.now = time.time()
 # 		print("now ", self.now)
 # 		print("end ", self.end)
-		if not self.move_stopper and msg.x !=0 and msg.y !=0:
+		if  msg.x !=0 and msg.y !=0:
 			if self.end > self.now:
 				pass
 			else:
 				self.end = time.time() +10
-				self.arm_move(300, 0, 0, 0, 0, 0)
+				self.arm_move(300, 0, -50, 0, 0, 0)
 				msgs = [msg.x, msg.y, msg.z]
 				x_a, y_a =0,0
 				for i in range(len(self.x_r_coefficient)):
@@ -128,11 +127,10 @@ class MOVE:
 				z_a = msg.z*self.z_r_coefficient + self.z_r_intercept+170
 				# x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
 				# y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
-				self.arm_move(x_a,y_a, 0, 0, 0, 0)
+				self.arm_move(x_a,y_a, -50, 0, 0, 0)
 				print("move to", x_a, y_a)
 		#                 self.arm_move(x_a,y_a,z_a, 0, 0, 0)
-# 				self.arm_disable()
-				self.move_stopper =True
+				self.arm_move(4.20, -250, -25, 0, 0, 0)
 #                 self.linetrace_start()
 
 		# self.last_clb_time_ = rospy.get_time()
