@@ -9,7 +9,7 @@ from darknet_ros_msgs.msg import Coordinate
 import rospy
 import cv_bridge
 import numpy as np
-from bringup.srv import MovJ, DO, EnableRobot, DisableRobot
+from bringup.srv import MovJ, DO, EnableRobot, DisableRobot, SpeedJ, AccJ
 from bringup.msg import ToolVectorActual
 from std_srvs.srv import Empty
 from std_srvs.srv import EmptyResponse
