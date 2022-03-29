@@ -115,12 +115,8 @@ class MOVE:
 			if self.end > self.now:
 				pass
 			else:
-<<<<<<< HEAD
-				self.end = rospy.get_rostime() + rospy.Time(10)
-=======
 				self.end = time.time() +10
->>>>>>> 87bd4a0623649db8dcf666f4700f9ff73aaf9d5a
-				self.arm_move(300, 0, 0, 0, 0, 0)
+                                self.arm_move(300, 0, 0, 0, 0, 0)
 				msgs = [msg.x, msg.y, msg.z]
 				x_a, y_a =0,0
 				for i in range(len(self.x_r_coefficient)):
