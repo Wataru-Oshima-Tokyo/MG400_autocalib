@@ -36,6 +36,8 @@ class MOVE:
 		self.calib_stop_srv = rospy.Service('/calibration/stop', Empty, self.calib_stop_service)
 		self.sub_jointState = rospy.Subscriber('/bringup/srv/ok', Twist, self.twist_callback)
 		self.camera_coordinate =np.array([[]])
+		self.now =rospy.get_rostime()
+		self.end = rospy.get_rostime()
 		self.calib = False
 		self.hz = 20
                 self.move_stopper= True
