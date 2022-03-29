@@ -21,6 +21,8 @@ class MOVE:
 		print("start MG400")
 		self.filepath ="/home/woshima/catkin_ws/src/MG400_autocalib/calibration.txt"
 		self.arm_move =rospy.ServiceProxy('/bringup/srv/MovJ',MovJ)
+		self.set_SpeedJ =rospy.ServiceProxy('/bringup/srv/SpeedJ',SpeedJ)
+		self.set_AccJ =rospy.ServiceProxy('/bringup/srv/AccJ',AccJ)
 		self.arm_enable = rospy.ServiceProxy('/bringup/srv/EnableRobot',EnableRobot)
                 self.linetrace_stop = rospy.ServiceProxy('/linetrace/stop',Empty)
                 self.linetrace_start = rospy.ServiceProxy('/linetrace/start',Empty)
@@ -62,6 +64,8 @@ class MOVE:
 		self.x_r_coefficient = [0,0,0]
 		self.y_r_coefficient = [0,0,0]
 		self.readCalibFile()
+		self.set_SpeedJ(100)
+		self.set_AccJ(100)
 
 
 
