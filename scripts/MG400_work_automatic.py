@@ -107,6 +107,7 @@ class MOVE:
             if self.move_stopper:
 #                 self.linetrace_stop()
                 self.move_stopper =False
+		print("get the message")
 		self.arm_move(300, 0, 0, 0, 0, 0)
                 msgs = [msg.x, msg.y, msg.z]
                 x_a, y_a =0,0
@@ -119,6 +120,7 @@ class MOVE:
                 # x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
                 # y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
                 self.arm_move(x_a,y_a, 0, 0, 0, 0)
+		print("move to", x_a, y_a)
                 time.sleep(1)
 #                 self.arm_move(x_a,y_a,z_a, 0, 0, 0)
                 time.sleep(10)
