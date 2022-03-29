@@ -108,7 +108,7 @@ class MOVE:
         def image_callback(self, msg):
 	#                 self.linetrace_stop()
 		self.move_stopper =False
-		print("get the message")
+# 		print("get the message")
 		self.now = time.time()
 # 		print("now ", self.now)
 # 		print("end ", self.end)
