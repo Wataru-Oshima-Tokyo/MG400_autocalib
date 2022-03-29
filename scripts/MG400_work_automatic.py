@@ -106,9 +106,8 @@ class MOVE:
 		self.arm_move(self.x_r, self.y_r, 0, 0, 0, 0)
 
         def image_callback(self, msg):
-            if self.move_stopper:
-#                 self.linetrace_stop()
-                self.move_stopper =False
+	#                 self.linetrace_stop()
+		self.move_stopper =False
 		print("get the message")
 		self.now = time.time()
 		print("now ", self.now)
@@ -118,7 +117,7 @@ class MOVE:
 				pass
 			else:
 				self.end = time.time() +10
-                                self.arm_move(300, 0, 0, 0, 0, 0)
+				self.arm_move(300, 0, 0, 0, 0, 0)
 				msgs = [msg.x, msg.y, msg.z]
 				x_a, y_a =0,0
 				for i in range(len(self.x_r_coefficient)):
