@@ -116,7 +116,7 @@ class MOVE:
 				pass
 			else:
 				self.end = time.time() +10
-				self.arm_move(300, 0, -50, 0, 0, 0)
+				self.arm_move(300, 0, 30, 0, 0, 0)
 				msgs = [msg.x, msg.y, msg.z]
 				x_a, y_a =0,0
 				for i in range(len(self.x_r_coefficient)):
@@ -127,10 +127,10 @@ class MOVE:
 				z_a = msg.z*self.z_r_coefficient + self.z_r_intercept+170
 				# x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
 				# y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
-				self.arm_move(x_a,y_a, -50, 0, 0, 0)
+				self.arm_move(x_a,y_a, 50, 0, 0, 0)
 				print("move to", x_a, y_a)
 		#                 self.arm_move(x_a,y_a,z_a, 0, 0, 0)
-				self.arm_move(4.20, -250, -25, 0, 0, 0)
+				self.arm_move(4.20, -250, 30, 0, 0, 0)
 #                 self.linetrace_start()
 
 		# self.last_clb_time_ = rospy.get_time()
