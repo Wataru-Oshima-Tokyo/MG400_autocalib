@@ -121,9 +121,9 @@ class MOVE:
                 # y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
                 self.arm_move(x_a,y_a, 0, 0, 0, 0)
 		print("move to", x_a, y_a)
-                time.sleep(1)
+                rospy.sleep(1)
 #                 self.arm_move(x_a,y_a,z_a, 0, 0, 0)
-                time.sleep(10)
+                rospy.sleep(10)
 		self.arm_disable()
                 self.move_stopper =True
 #                 self.linetrace_start()
