@@ -110,8 +110,8 @@ class MOVE:
 		self.move_stopper =False
 		print("get the message")
 		self.now = time.time()
-		print("now ", self.now)
-		print("end ", self.end)
+# 		print("now ", self.now)
+# 		print("end ", self.end)
 		if not self.move_stopper:
 			if self.end > self.now:
 				pass
