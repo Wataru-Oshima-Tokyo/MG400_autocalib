@@ -115,7 +115,7 @@ class MOVE:
 			if self.end > self.now:
 				pass
 			else:
-				self.end = rospy.get_rostime() + rospy.Duration(10)
+				self.end = rospy.get_rostime() + rospy.Time(10)
 				self.arm_move(300, 0, 0, 0, 0, 0)
 				msgs = [msg.x, msg.y, msg.z]
 				x_a, y_a =0,0

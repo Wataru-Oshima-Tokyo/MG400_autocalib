@@ -17,9 +17,9 @@
      </include>
 	<include file="$(find darknet_ros)/launch/darknet_ros.launch"/>
   <node name="specific_object" pkg="darknet_ros" type="specific_object"/>
-    <node name="MG400_autocalib_move"
+    <!--node name="MG400_autocalib_move"
         pkg="MG400_autocalib"
         type="MG400_work_automatic.py"
-        output="screen"/>	
+        output="screen"/-->	
 
 </launch>
