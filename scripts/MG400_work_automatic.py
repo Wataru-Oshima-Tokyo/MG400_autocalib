@@ -130,6 +130,9 @@ class MOVE:
 				x_a += self.x_r_intercept
 				y_a += self.y_r_intercept
 				z_a = msg.z*self.z_r_coefficient + self.z_r_intercept
+				if z_a>0:
+					z_a *= -1
+				z_a +=170
 				# x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
 				# y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
 				self.arm_move(x_a,y_a, 50, 0, 0, 0)
