@@ -32,7 +32,7 @@ class MOVE:
 		self.sub = rospy.Subscriber("/objectdetection/coordinate", Coordinate, self.image_callback)
 		self.pub_move = rospy.Publisher("/autocalib/move", Int16, queue_size=10)
 		self.work_start_srv_ = rospy.Service('/mg400_work/start', Empty, self.work_start_service)
-		self.twist_pub = rospy.Subscriber('/cmd_vel', Twist, self.twist_callback)
+                self.twist_pub = rospy.Subscriber('/MG400/cmd_vel', Twist, self.twist_callback)
 		self.work_stop_srv_ = rospy.Service('/mg400_work/stop', Empty, self.work_stop_service)
 		self.calib_start_srv = rospy.Service('/calibration/start', Empty, self.calib_start_service)
 		self.calib_stop_srv = rospy.Service('/calibration/stop', Empty, self.calib_stop_service)
