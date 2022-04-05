@@ -117,7 +117,7 @@ class MOVE:
 				self.z_i = msg.z
 				self.addCoordinate()
 			elif msg.t =="M":
-				self.cancelAppend()
+# 				self.cancelAppend()
 				self.calibration()
 				pass
 		else:
