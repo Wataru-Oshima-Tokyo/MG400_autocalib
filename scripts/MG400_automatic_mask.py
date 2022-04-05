@@ -5,7 +5,7 @@ import cv2 as cv
 from sensor_msgs.msg import Image
 from std_msgs.msg import Int16
 from geometry_msgs.msg import Twist
-from darknet_ros_msgs.msg import Coordinate
+from camera_pkg.msg import Coordinate
 import rospy
 import cv_bridge
 import numpy as np
@@ -111,21 +111,15 @@ class MOVE:
 		self.arm_move(self.x_r, self.y_r, 0, 0, 0, 0)
 
         def image_callback(self, msg):
+	#                 self.linetrace_stop()
 # 		print("get the message")
 		self.now = time.time()
 # 		print("now ", self.now)
 # 		print("end ", self.end)
-		if  (msg.x !=0 and msg.y !=0) and (msg.x <400):
+		if  msg.x !=0 and msg.y !=0:
 			if self.end > self.now:
-				try:
-					self.linetrace_stop()
-				except:
-					pass
+				pass
 			else:
-				try:
-					self.linetrace_stop()
-				except:
-					pass
 				self.end = time.time() +10
 				self.arm_move(300, 0, 30, 0, 0, 0)
 				msgs = [msg.x, msg.y, msg.z]
@@ -138,20 +132,16 @@ class MOVE:
 				z_a = msg.z*self.z_r_coefficient + self.z_r_intercept
 				if z_a>0:
 					z_a *= -1
-				z_a =-14
-                                #z_a = -30
+				z_a +=170
 				# x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
 				# y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
-				self.arm_move(x_a,y_a, 80, 0, 0, 0)
+				self.arm_move(x_a,y_a, 50, 0, 0, 0)
 				print("move to", x_a, y_a, z_a)
 				self.arm_move(x_a,y_a,z_a, 0, 0, 0)
-				self.arm_move(x_a,y_a, 80, 0, 0, 0)
+				self.arm_move(x_a,y_a, 50, 0, 0, 0)
 				self.arm_move(300, 0, 30, 0, 0, 0)
 				self.arm_move(4.20, -250, 30, 0, 0, 0)
-				try:
-					self.linetrace_start()
-				except:
-					pass
+#                 self.linetrace_start()
 
 		# self.last_clb_time_ = rospy.get_time()
 
