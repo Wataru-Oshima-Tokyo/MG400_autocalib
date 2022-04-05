@@ -44,6 +44,9 @@ class MOVE:
 		self.x_r =0
 		self.y_r =0
 		self.z_r =0
+		self.temp_x_r = 0
+		self.temp_y_r = 0
+		self.temp_z_r = 0
 		self.x_i =0
 		self.y_i =0
 		self.z_i =0
@@ -84,13 +87,15 @@ class MOVE:
 		except Exception as e:
 			print(e)
 			
-
-			
+	def getRobotCoordinate(self):
+		self.x_r = self.temp_x_r
+		self.y_r = self.temp_y_r
+		self.z_r = self.temp_z_r
 
 	def robotCoordinate_callback(self, coordinate):
-		self.x_r = coordinate.x
-		self.y_r = coordinate.y
-		self.z_r = coordinate.z
+		self.temp_x_r = coordinate.x
+		self.temp_y_r = coordinate.y
+		self.temp_z_r = coordinate.z
 
 	def twist_callback(self, msg):
 		if msg.angular.z>0:
@@ -105,13 +110,14 @@ class MOVE:
 		#from left to center, (332,145) and robot (300, 113)
 		if self.calib:
 			if msg.t =="L":
+				self.getRobotCoordinate()
+			elif msg.t =="R":
 				self.x_i = msg.x
 				self.y_i = msg.y
 				self.z_i = msg.z
 				self.addCoordinate()
-			elif msg.t =="R":
-				self.cancelAppend()
 			elif msg.t =="M":
+				self.cancelAppend()
 				self.calibration()
 				pass
 		else:
@@ -160,8 +166,7 @@ class MOVE:
 			self.z_r_arr.append(self.z_r)
 		else:
 			pass
-
-
+		
 	def calibration(self):
 		self.camera_z = self.camera_z.reshape(-1,1)
 		print(self.camera_z)
