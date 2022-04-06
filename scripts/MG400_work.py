@@ -122,9 +122,10 @@ class MOVE:
 		#from left to center, (332,145) and robot (300, 113)
 		if self.xy_calib or self.z_calib:
 			if msg.t =="L":
+                                #self.arm_enable()
 				self.getRobotCoordinate()
-				self.arm_move(self.x_r, self.y_r, 0, 0, 0, 0)
-				self.arm_move(4.20, 250, 30, 0, 0, 0)
+				#self.arm_move(self.x_r, self.y_r, 0, 0, 0, 0)
+				#self.arm_move(4.20, 250, 30, 0, 0, 0)
 				self.pre_x_r=self.x_r
 				self.pre_y_r=self.y_r
 				self.pre_z_r=self.z_r
@@ -133,7 +134,8 @@ class MOVE:
 				self.y_i = msg.y
 				self.z_i = msg.z
 				self.addCoordinate()
-				self.arm_move(self.pre_x_r, self.pre_y_r, self.z_r+20, 0, 0, 0)
+				#self.arm_move(self.pre_x_r, self.pre_y_r, self.pre_z_r+20, 0, 0, 0)
+                                #self.arm_disable()
 			elif msg.t =="M":
 # 				self.cancelAppend()
 				self.calibration()
