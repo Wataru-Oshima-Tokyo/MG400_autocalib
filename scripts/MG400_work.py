@@ -171,8 +171,8 @@ class MOVE:
 
 	def addCoordinate(self):
 		if self.x_r != 0  and self.y_r !=0 and self.z_r !=0:
-			pose =np.array([[self.x_i, self.y_i, self.z_i]])
-			# pose =np.array([[self.x_i, self.y_i]])
+			#pose =np.array([[self.x_i, self.y_i, self.z_i]])
+			pose =np.array([[self.x_i, self.y_i]])
 			z_coordiante = np.array([self.z_i])
 			if self.camera_coordinate.size ==0:
 				self.camera_coordinate = pose
