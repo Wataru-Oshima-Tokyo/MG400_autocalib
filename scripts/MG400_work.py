@@ -32,9 +32,9 @@ class MOVE:
 		self.twist_pub = rospy.Subscriber('/cmd_vel', Twist, self.twist_callback)
 		self.work_stop_srv_ = rospy.Service('/mg400_work/stop', Empty, self.work_stop_service)
 		self.xy_calib_start_srv = rospy.Service('/xy_calibration/start', Empty, self.xy_calib_start_service)
-		self.xy_calib_stop_srv = rospy.Service('/xy_calibration/stop', Empty, self.xy_calib_start_service)
-		self.z_calib_start_srv = rospy.Service('/xy_calibration/start', Empty, self.z_calib_start_service)
-		self.z_calib_stop_srv = rospy.Service('/xy_calibration/stop', Empty, self.z_calib_start_service)
+		self.xy_calib_stop_srv = rospy.Service('/xy_calibration/stop', Empty, self.xy_calib_stop_service)
+		self.z_calib_start_srv = rospy.Service('/z_calibration/start', Empty, self.z_calib_start_service)
+		self.z_calib_stop_srv = rospy.Service('/z_calibration/stop', Empty, self.z_calib_stop_service)
 		self.sub_jointState = rospy.Subscriber('/bringup/srv/ok', Twist, self.twist_callback)
 		self.camera_coordinate =np.array([[]])
 		self.xy_calib = False
@@ -138,7 +138,7 @@ class MOVE:
 					y_a += msgs[i]*self.y_r_coefficient[i]
 				x_a += self.x_r_intercept
 				y_a += self.y_r_intercept
-				z_a = msg.z*self.z_r_coefficient + self.z_r_intercept+170
+				z_a = msg.z*self.z_r_coefficient + self.z_r_intercept
 				#z_a = -30
                                 # x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
 				# y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
@@ -198,9 +198,9 @@ class MOVE:
 				file.write(str(self.z_coefficient.intercept_))
     			
 		self.readCalibFile()
-		self.x_r_arr.clear()
-		self.y_r_arr.clear()
-		self.z_r_arr.clear()
+		self.x_r_arr =[]
+		self.y_r_arr =[]
+		self.z_r_arr =[]
 		
 
 
@@ -227,7 +227,7 @@ class MOVE:
 		self.xy_calib = True
 		return EmptyResponse()
 	
-	def xy_calib_start_service(self,req):
+	def xy_calib_stop_service(self,req):
 		print("stop calibration")
 		self.xy_calib = False
 		return EmptyResponse()
@@ -237,7 +237,7 @@ class MOVE:
 		self.z_calib = True
 		return EmptyResponse()
 	
-	def z_calib_start_service(self,req):
+	def z_calib_stop_service(self,req):
 		print("stop calibration")
 		self.z_calib = False
 		return EmptyResponse()
