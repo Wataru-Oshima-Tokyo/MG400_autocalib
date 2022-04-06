@@ -19,7 +19,8 @@ import math
 class MOVE:
 	def __init__(self):
 		print("start MG400")
-		self.filepath ="/home/woshima/catkin_ws/src/MG400_autocalib/calibration.txt"
+		self.xy_filepath ="/home/woshima/catkin_ws/src/MG400_autocalib/xy_calibration.txt"
+		self.z_filepath ="/home/woshima/catkin_ws/src/MG400_autocalib/z_calibration.txt"
 		self.arm_move =rospy.ServiceProxy('/bringup/srv/MovJ',MovJ)
 		self.arm_enable = rospy.ServiceProxy('/bringup/srv/EnableRobot',EnableRobot)
 		self.robot_coordinate = rospy.Subscriber("/bringup/msg/ToolVectorActual", ToolVectorActual, self.robotCoordinate_callback)
@@ -30,11 +31,14 @@ class MOVE:
 		self.work_start_srv_ = rospy.Service('/mg400_work/start', Empty, self.work_start_service)
 		self.twist_pub = rospy.Subscriber('/cmd_vel', Twist, self.twist_callback)
 		self.work_stop_srv_ = rospy.Service('/mg400_work/stop', Empty, self.work_stop_service)
-		self.calib_start_srv = rospy.Service('/calibration/start', Empty, self.calib_start_service)
-		self.calib_stop_srv = rospy.Service('/calibration/stop', Empty, self.calib_stop_service)
+		self.xy_calib_start_srv = rospy.Service('/xy_calibration/start', Empty, self.xy_calib_start_service)
+		self.xy_calib_stop_srv = rospy.Service('/xy_calibration/stop', Empty, self.xy_calib_start_service)
+		self.z_calib_start_srv = rospy.Service('/xy_calibration/start', Empty, self.z_calib_start_service)
+		self.z_calib_stop_srv = rospy.Service('/xy_calibration/stop', Empty, self.z_calib_start_service)
 		self.sub_jointState = rospy.Subscriber('/bringup/srv/ok', Twist, self.twist_callback)
 		self.camera_coordinate =np.array([[]])
-		self.calib = False
+		self.xy_calib = False
+		self.z_calib = False
 		self.hz = 20
 		self.camera_z = np.array([[]])
                 self.RUN = 0
@@ -65,7 +69,7 @@ class MOVE:
 
 	def readCalibFile(self):
 		try:
-			with open(self.filepath,"r") as file:	
+			with open(self.xy_filepath,"r") as file:	
 				line = file.read()
 			line = line.split("\n")
 			print(line)
@@ -81,9 +85,14 @@ class MOVE:
 						self.y_r_coefficient[j] = float(word[j])
 					self.y_r_intercept = float(word[-1])
 				else:
-					self.z_r_coefficient = float(word[0])
-					self.z_r_intercept = float(word[1])
-				print("done reading calib file ")
+					pass
+			with open(self.z_filepath,"r") as file:
+					line = file.read()
+			line = line.split(",")
+			for i in range(len(line)):
+				self.z_r_coefficient = float(line[0])
+				self.z_r_intercept = float(line[1])
+			print("done reading calib file ")
 		except Exception as e:
 			print(e)
 			
@@ -108,7 +117,7 @@ class MOVE:
 	def image_callback(self, msg):
 		#initial postion for MG400 in image coordinate is 566(x),145(y) and robot coordination is (300, 0)
 		#from left to center, (332,145) and robot (300, 113)
-		if self.calib:
+		if self.xy_calib or self.z_calib:
 			if msg.t =="L":
 				self.getRobotCoordinate()
 			elif msg.t =="R":
@@ -160,8 +169,6 @@ class MOVE:
 			else:
 				self.camera_coordinate = np.append(self.camera_coordinate, pose, axis=0)
 				self.camera_z = np.append(self.camera_z, z_coordiante)
-				print(self.camera_coordinate)
-				print(self.camera_z)
 			self.x_r_arr.append(self.x_r)
 			self.y_r_arr.append(self.y_r)
 			self.z_r_arr.append(self.z_r)
@@ -175,16 +182,25 @@ class MOVE:
 		self.y_coefficient = LinearRegression().fit(self.camera_coordinate, self.y_r_arr)
 		self.z_coefficient = LinearRegression().fit(self.camera_z, self.z_r_arr)
 		print(self.x_coefficient.coef_, self.x_coefficient.intercept_ , self.y_coefficient.coef_, self.y_coefficient.intercept_, self.z_coefficient.coef_, self.z_coefficient.intercept_)
-		with open(self.filepath,"w+") as file:
-			for i in range(len(self.x_coefficient.coef_)):
-				file.write(str(self.x_coefficient.coef_[i])+',')
-			file.write(str(self.x_coefficient.intercept_)+'\n')
-			for i in range(len(self.y_coefficient.coef_)):
-				file.write(str(self.y_coefficient.coef_[i])+',')
-			file.write(str(self.y_coefficient.intercept_)+'\n')
-			file.write(str(self.z_coefficient.coef_[0])+',')
-			file.write(str(self.z_coefficient.intercept_))
+		if self.xy_calib:
+			with open(self.xy_filepath,"w+") as file:
+				for i in range(len(self.x_coefficient.coef_)):
+					file.write(str(self.x_coefficient.coef_[i])+',')
+				file.write(str(self.x_coefficient.intercept_)+'\n')
+				for i in range(len(self.y_coefficient.coef_)):
+					file.write(str(self.y_coefficient.coef_[i])+',')
+				file.write(str(self.y_coefficient.intercept_)+'\n')
+				file.write(str(self.z_coefficient.coef_[0])+',')
+				file.write(str(self.z_coefficient.intercept_))
+		elif self.z_calib:
+			with open(self.z_filepath,"w+") as file:
+				file.write(str(self.z_coefficient.coef_[0])+',')
+				file.write(str(self.z_coefficient.intercept_))
+    			
 		self.readCalibFile()
+		self.x_r_arr.clear()
+		self.y_r_arr.clear()
+		self.z_r_arr.clear()
 		
 
 
@@ -206,14 +222,24 @@ class MOVE:
                 self.arm_disable()
 		return EmptyResponse()
 	
-	def calib_start_service(self,req):
+	def xy_calib_start_service(self,req):
 		print("start calibration")
-		self.calib = True
+		self.xy_calib = True
 		return EmptyResponse()
 	
-	def calib_stop_service(self,req):
+	def xy_calib_start_service(self,req):
 		print("stop calibration")
-		self.calib = False
+		self.xy_calib = False
+		return EmptyResponse()
+	
+	def z_calib_start_service(self,req):
+		print("start calibration")
+		self.z_calib = True
+		return EmptyResponse()
+	
+	def z_calib_start_service(self,req):
+		print("stop calibration")
+		self.z_calib = False
 		return EmptyResponse()
 
 
