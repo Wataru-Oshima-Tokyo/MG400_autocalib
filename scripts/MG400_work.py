@@ -192,15 +192,18 @@ class MOVE:
 				file.write(str(self.y_coefficient.intercept_)+'\n')
 				file.write(str(self.z_coefficient.coef_[0])+',')
 				file.write(str(self.z_coefficient.intercept_))
+			self.xy_calib = False
 		elif self.z_calib:
 			with open(self.z_filepath,"w+") as file:
 				file.write(str(self.z_coefficient.coef_[0])+',')
-				file.write(str(self.z_coefficient.intercept_))
-    			
+				file.write(str(self.z_coefficient.intercept_))	
+			self.z_calib = False	
 		self.readCalibFile()
 		self.x_r_arr.clear()
 		self.y_r_arr.clear()
 		self.z_r_arr.clear()
+		self.camera_coordinate =np.array([[]])
+		self.camera_z = np.array([[]])
 		
 
 
