@@ -92,7 +92,8 @@ class MOVE:
 			with open(self.z_filepath,"r") as file:
 					line = file.read()
 			line = line.split(",")
-			for i in range(len(line)):
+			print(line)
+                        for i in range(len(line)):
 				self.z_r_coefficient = float(line[0])
 				self.z_r_intercept = float(line[1])
 			print("done reading calib file ")
@@ -239,22 +240,22 @@ class MOVE:
 		return EmptyResponse()
 	
 	def xy_calib_start_service(self,req):
-		print("start calibration")
+		print("start xy_alibration")
 		self.xy_calib = True
 		return EmptyResponse()
 	
 	def xy_calib_stop_service(self,req):
-		print("stop calibration")
+		print("stop xy_calibration")
 		self.xy_calib = False
 		return EmptyResponse()
 	
 	def z_calib_start_service(self,req):
-		print("start calibration")
+		print("start z_calibration")
 		self.z_calib = True
 		return EmptyResponse()
 	
 	def z_calib_stop_service(self,req):
-		print("stop calibration")
+		print("stop z_calibration")
 		self.z_calib = False
 		return EmptyResponse()
 
