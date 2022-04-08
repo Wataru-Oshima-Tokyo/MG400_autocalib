@@ -157,20 +157,28 @@ class MOVE:
                                 # x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
 				# y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
 				self.arm_move(x_a,y_a, 0, 0, 0, 0)
+				self.sync()
 				time.sleep(1)
 				self.arm_move(x_a,y_a,z_a, 0, 0, 0)
 				self.sync()
 				time.sleep(1)
+				#self.sync()
 				self.suction(1,1)
+				self.sync()
 				self.arm_move(x_a,y_a,0, 0, 0, 0)
+				self.sync()
 				self.arm_move(-4,-250,0, 0, 0, 0)
+				self.sync()
 				self.arm_move(-4,-250,z_a, 0, 0, 0)
 				self.sync()
 				time.sleep(1)
 				self.suction(2,1)
+				self.sync()
 				self.suction(2,0)
+				self.sync()
 				time.sleep(1)
 				self.arm_move(-4,-250,0, 0, 0, 0)
+				self.sync()
 			elif msg.t =="R":
 				self.cancelAppend()
 			elif msg.t =="M":
