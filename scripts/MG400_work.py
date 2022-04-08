@@ -164,7 +164,7 @@ class MOVE:
 				self.arm_move(x_a,y_a,0, 0, 0, 0)
 				self.arm_move(-4,-250,0, 0, 0, 0)
 				self.arm_move(-4,-250,z_a, 0, 0, 0)
-				time.sleep(10)
+				time.sleep(15)
 				self.suction(2,1)
 				time.sleep(2)
 				self.suction(2,0)
