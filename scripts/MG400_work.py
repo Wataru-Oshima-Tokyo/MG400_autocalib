@@ -22,6 +22,8 @@ class MOVE:
 		self.xy_filepath ="/home/woshima/catkin_ws/src/MG400_autocalib/xy_calibration.txt"
 		self.z_filepath ="/home/woshima/catkin_ws/src/MG400_autocalib/z_calibration.txt"
 		self.arm_move =rospy.ServiceProxy('/bringup/srv/MovJ',MovJ)
+		self.suction =rospy.ServiceProxy('/bringup/srv/DO',DO)
+		self.sync =rospy.ServiceProxy('/bringup/srv/Sync',Sync)
 		self.arm_enable = rospy.ServiceProxy('/bringup/srv/EnableRobot',EnableRobot)
 		self.robot_coordinate = rospy.Subscriber("/bringup/msg/ToolVectorActual", ToolVectorActual, self.robotCoordinate_callback)
                 self.arm_disable = rospy.ServiceProxy('/bringup/srv/DisableRobot',DisableRobot)
@@ -157,6 +159,15 @@ class MOVE:
 				self.arm_move(x_a,y_a, 0, 0, 0, 0)
 				time.sleep(1)
 				self.arm_move(x_a,y_a,z_a, 0, 0, 0)
+				time.sleep(1)
+				self.suction(1,1)
+				self.arm_move(x_a,y_a,0, 0, 0, 0)
+				self.arm_move(-4,-250,0, 0, 0, 0)
+				self.arm_move(-4,-250,z_a, 0, 0, 0)
+				time.sleep(1)
+				self.suction(1,0)
+				time.sleep(1)
+				self.arm_move(-4,-250,0, 0, 0, 0)
 			elif msg.t =="R":
 				self.cancelAppend()
 			elif msg.t =="M":
