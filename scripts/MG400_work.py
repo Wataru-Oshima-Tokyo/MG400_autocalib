@@ -27,7 +27,6 @@ class MOVE:
 		self.arm_enable = rospy.ServiceProxy('/bringup/srv/EnableRobot',EnableRobot)
 		self.robot_coordinate = rospy.Subscriber("/bringup/msg/ToolVectorActual", ToolVectorActual, self.robotCoordinate_callback)
                 self.arm_disable = rospy.ServiceProxy('/bringup/srv/DisableRobot',DisableRobot)
-		self.suction = rospy.ServiceProxy('/bringup/srv/DO', DO)
 		self.sub = rospy.Subscriber("/camera_pkg/coordinate", Coordinate, self.image_callback)
 		self.pub_move = rospy.Publisher("/autocalib/move", Int16, queue_size=10)
 		self.work_start_srv_ = rospy.Service('/mg400_work/start', Empty, self.work_start_service)
