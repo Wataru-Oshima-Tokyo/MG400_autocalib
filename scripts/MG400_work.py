@@ -9,7 +9,7 @@ from camera_pkg.msg import Coordinate
 import rospy
 import cv_bridge
 import numpy as np
-from bringup.srv import MovJ, DOExecute, EnableRobot, DisableRobot,Sync
+from bringup.srv import MovJ, DO, EnableRobot, DisableRobot,Sync
 from bringup.msg import ToolVectorActual
 from std_srvs.srv import Empty
 from std_srvs.srv import EmptyResponse
@@ -22,7 +22,7 @@ class MOVE:
 		self.xy_filepath ="/home/woshima/catkin_ws/src/MG400_autocalib/xy_calibration.txt"
 		self.z_filepath ="/home/woshima/catkin_ws/src/MG400_autocalib/z_calibration.txt"
 		self.arm_move =rospy.ServiceProxy('/bringup/srv/MovJ',MovJ)
-		self.suction =rospy.ServiceProxy('/bringup/srv/DOExecute',DOExecute)
+		self.suction =rospy.ServiceProxy('/bringup/srv/DOExecute',DO)
 		self.sync =rospy.ServiceProxy('/bringup/srv/Sync',Sync)
 		self.arm_enable = rospy.ServiceProxy('/bringup/srv/EnableRobot',EnableRobot)
 		self.robot_coordinate = rospy.Subscriber("/bringup/msg/ToolVectorActual", ToolVectorActual, self.robotCoordinate_callback)
