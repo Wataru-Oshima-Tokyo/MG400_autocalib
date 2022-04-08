@@ -157,7 +157,7 @@ class MOVE:
 				# y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
 				self.arm_move(x_a,y_a, 0, 0, 0, 0)
 				self.arm_move(x_a,y_a,z_a, 0, 0, 0)
-				time.sleep(7)
+				time.sleep(5)
 				self.suction(1,1)
 				time.sleep(1)
 				self.suction(1,0)
@@ -166,7 +166,7 @@ class MOVE:
 				self.arm_move(-4,-250,z_a, 0, 0, 0)
 				time.sleep(10)
 				self.suction(2,1)
-				time.sleep(1)
+				time.sleep(2)
 				self.suction(2,0)
 				time.sleep(1)
 				self.arm_move(-4,-250,0, 0, 0, 0)
