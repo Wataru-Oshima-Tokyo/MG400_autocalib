@@ -292,4 +292,4 @@ if __name__ == "__main__":
 	rospy.init_node('MG400_work')
 	mv = MOVE()
 	rospy.spin()
-	mv.work_stop_service(Empty)
+# 	mv.work_stop_service(Empty)
