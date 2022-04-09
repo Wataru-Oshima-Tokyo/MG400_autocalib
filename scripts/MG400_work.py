@@ -158,9 +158,6 @@ class MOVE:
 				z_a = -151
                                 # x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
 				# y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
-				self.place_y += 30
-				if self.count%3 ==0:
-					self.place_x +=30
 				self.arm_move(x_a,y_a, 0, 0, 0, 0)
 				self.arm_move(x_a,y_a,z_a, 0, 0, 0)
 				time.sleep(8)
@@ -168,8 +165,8 @@ class MOVE:
 				time.sleep(1)
 				self.suction(1,0)
 				self.arm_move(x_a,y_a,0, 0, 0, 0)
-				self.arm_move(-4,-250,0, 0, 0, 0)
-				self.arm_move(-4,-250,z_a, 0, 0, 0)
+				self.arm_move(self.place_x,self.place_y,0, 0, 0, 0)
+				self.arm_move(self.place_x,self.place_y,z_a, 0, 0, 0)
 				time.sleep(15)
 				self.suction(2,1)
 				time.sleep(2)
@@ -177,6 +174,9 @@ class MOVE:
 				time.sleep(1)
 				self.arm_move(-4,-250,0, 0, 0, 0)
 				time.sleep(3)
+				self.place_y += 30
+				if self.count%3 ==0:
+					self.place_x +=30
 			elif msg.t =="R":
 				self.xy_calib_start_service(Empty)
 			elif msg.t =="M":
