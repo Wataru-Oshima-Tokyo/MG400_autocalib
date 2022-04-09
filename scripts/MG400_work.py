@@ -44,6 +44,9 @@ class MOVE:
 		self.camera_z = np.array([[]])
                 self.RUN = 0
                 self.TIMEOUT = 0.5
+		self.count=0
+		self.place_y=-250
+		self.place_x=-20
 		rate = rospy.Rate(self.hz)
 		self.last_clb_time_ = rospy.get_time()
 		self.x_r =0
@@ -152,9 +155,12 @@ class MOVE:
 				x_a += self.x_r_intercept
 				y_a += self.y_r_intercept
 				z_a = msg.z*self.z_r_coefficient + self.z_r_intercept
-				#z_a = -30
+				z_a = -151
                                 # x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
 				# y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
+				self.place_y += 30
+				if self.count%3 ==0:
+					self.place_x +=30
 				self.arm_move(x_a,y_a, 0, 0, 0, 0)
 				self.arm_move(x_a,y_a,z_a, 0, 0, 0)
 				time.sleep(8)
@@ -172,11 +178,11 @@ class MOVE:
 				self.arm_move(-4,-250,0, 0, 0, 0)
 				time.sleep(3)
 			elif msg.t =="R":
-				self.cancelAppend()
+				self.xy_calib_start_service(Empty)
 			elif msg.t =="M":
-				self.calibration()
-				pass
-		
+				self.z_calib_start_service(Empty)
+			self.count+=1
+			
 
 		self.last_clb_time_ = rospy.get_time()
 
