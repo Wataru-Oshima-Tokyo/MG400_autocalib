@@ -45,8 +45,8 @@ class MOVE:
                 self.RUN = 0
                 self.TIMEOUT = 0.5
 		self.count=0
-		self.place_y=-250
-		self.place_x=-20
+		self.place_y=-352
+		self.place_x=1
 		rate = rospy.Rate(self.hz)
 		self.last_clb_time_ = rospy.get_time()
 		self.x_r =0
@@ -174,14 +174,15 @@ class MOVE:
 				time.sleep(1)
 				self.arm_move(-4,-250,0, 0, 0, 0)
 				time.sleep(3)
-				self.place_y += 30
-				if self.count%3 ==0:
-					self.place_x +=30
+
 			elif msg.t =="R":
 				self.xy_calib_start_service(Empty)
 			elif msg.t =="M":
 				self.z_calib_start_service(Empty)
 			self.count+=1
+			self.place_x += 40
+			if self.count%3 ==0:
+				self.place_y +=40
 			
 
 		self.last_clb_time_ = rospy.get_time()
