@@ -46,7 +46,7 @@ class MOVE:
                 self.TIMEOUT = 0.5
 		self.count=0
 		self.place_y=-352
-		self.place_x=1
+		self.place_x=0
 		rate = rospy.Rate(self.hz)
 		self.last_clb_time_ = rospy.get_time()
 		self.x_r =0
@@ -183,6 +183,7 @@ class MOVE:
 			self.place_x += 40
 			if self.count%3 ==0:
 				self.place_y +=40
+				self.place_x=0 
 			
 
 		self.last_clb_time_ = rospy.get_time()
@@ -268,6 +269,9 @@ class MOVE:
 	def xy_calib_stop_service(self,req):
 		print("stop xy_calibration")
 		self.xy_calib = False
+		self.camera_coordinate =np.array([[]])
+		self.x_r_arr =[]
+		self.y_r_arr =[]
 		return EmptyResponse()
 	
 	def z_calib_start_service(self,req):
@@ -278,6 +282,8 @@ class MOVE:
 	def z_calib_stop_service(self,req):
 		print("stop z_calibration")
 		self.z_calib = False
+		self.camera_z = np.array([[]])
+		self.z_r_arr =[]
 		return EmptyResponse()
 
 
@@ -286,3 +292,4 @@ if __name__ == "__main__":
 	rospy.init_node('MG400_work')
 	mv = MOVE()
 	rospy.spin()
+	self.arm_disable()
