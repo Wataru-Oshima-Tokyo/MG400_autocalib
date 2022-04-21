@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(MG400_autocalib)
+project(MG400_basic)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
