@@ -19,7 +19,8 @@ import math
 class MOVE:
 	def __init__(self):
 		print("start MG400")
-		self.filepath ="/home/woshima/catkin_ws/src/MG400_autocalib/calibration.txt"
+		self.xy_filepath ="/home/woshima/catkin_ws/src/MG400_basic/xy_calibration.txt"
+		self.z_filepath ="/home/woshima/catkin_ws/src/MG400_basic/z_calibration.txt"
 		self.arm_move =rospy.ServiceProxy('/bringup/srv/MovJ',MovJ)
 		self.set_SpeedJ =rospy.ServiceProxy('/bringup/srv/SpeedJ',SpeedJ)
 		self.set_AccJ =rospy.ServiceProxy('/bringup/srv/AccJ',AccJ)
@@ -45,6 +46,8 @@ class MOVE:
                 self.move_stopper= True
 		self.camera_z = np.array([[]])
                 self.RUN = 0
+		self.place_y=-352
+		self.place_x=0
                 self.TIMEOUT = 0.5
 		rate = rospy.Rate(self.hz)
 		self.last_clb_time_ = rospy.get_time()
@@ -72,7 +75,7 @@ class MOVE:
 
 	def readCalibFile(self):
 		try:
-			with open(self.filepath,"r") as file:	
+			with open(self.xy_filepath,"r") as file:	
 				line = file.read()
 			line = line.split("\n")
 			print(line)
@@ -88,9 +91,15 @@ class MOVE:
 						self.y_r_coefficient[j] = float(word[j])
 					self.y_r_intercept = float(word[-1])
 				else:
-					self.z_r_coefficient = float(word[0])
-					self.z_r_intercept = float(word[1])
-				print("done reading calib file ")
+					pass
+			with open(self.z_filepath,"r") as file:
+					line = file.read()
+			line = line.split(",")
+			print(line)
+                        for i in range(len(line)):
+				self.z_r_coefficient = float(line[0])
+				self.z_r_intercept = float(line[1])
+			print("done reading calib file ")
 		except Exception as e:
 			print(e)
 			
