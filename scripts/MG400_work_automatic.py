@@ -145,7 +145,7 @@ class MOVE:
 				x_a += self.x_r_intercept
 				y_a += self.y_r_intercept
 				z_a = msg.z*self.z_r_coefficient + self.z_r_intercept
-				z_a = -151. #constant
+				z_a = -162 #constant
 				self.arm_move(x_a,y_a, 0, 0, 0, 0)
 				self.arm_move(x_a,y_a,z_a, 0, 0, 0)
 				time.sleep(7)

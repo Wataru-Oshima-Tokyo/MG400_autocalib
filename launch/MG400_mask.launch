@@ -17,9 +17,15 @@
      </include>
 	<!-- <include file="$(find darknet_ros)/launch/darknet_ros.launch"/> -->
   <!-- <node name="specific_object" pkg="darknet_ros" type="specific_object"/> -->
-    <!--node name="MG400_autocalib_move"
-        pkg="MG400_autocalib"
+    
+     <node name="mask_deteciton"
+	pkg="camera_pkg"
+	type="mask_detect"
+	output="screen"/>	
+     
+    <node name="MG400_automatic_pickup"
+        pkg="MG400_basic"
         type="MG400_work_automatic.py"
-        output="screen"/-->	
+        output="screen"/>	
 
 </launch>
