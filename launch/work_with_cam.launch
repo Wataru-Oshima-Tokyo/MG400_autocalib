@@ -36,11 +36,11 @@
 
     <node name="camera_pkg"
         pkg="camera_pkg"
-        type="canny_ros"
+        type="ros_rgbd"
         output="screen"/>
         
-    <node name="MG400_autocalib_move"
-        pkg="MG400_autocalib"
+    <node name="MG400_calibration"
+        pkg="MG400_basic"
         type="MG400_work.py"
         output="screen"/>
                                     

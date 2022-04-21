@@ -19,8 +19,8 @@ import math
 class MOVE:
 	def __init__(self):
 		print("start MG400")
-		self.xy_filepath ="/home/woshima/catkin_ws/src/MG400_autocalib/xy_calibration.txt"
-		self.z_filepath ="/home/woshima/catkin_ws/src/MG400_autocalib/z_calibration.txt"
+		self.xy_filepath ="/home/woshima/catkin_ws/src/MG400_basic/xy_calibration.txt"
+		self.z_filepath ="/home/woshima/catkin_ws/src/MG400_basic/z_calibration.txt"
 		self.arm_move =rospy.ServiceProxy('/bringup/srv/MovJ',MovJ)
 		self.suction =rospy.ServiceProxy('/bringup/srv/DOExecute',DO)
 		self.sync =rospy.ServiceProxy('/bringup/srv/Sync',Sync)
