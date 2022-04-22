@@ -145,26 +145,23 @@ class MOVE:
 				x_a += self.x_r_intercept
 				y_a += self.y_r_intercept
 				z_a = msg.z*self.z_r_coefficient + self.z_r_intercept
-<<<<<<< HEAD
-				z_a = -162 #constant
-=======
-				z_a = -153 #constant
->>>>>>> ffa4a0a325cc8cb3e3638ec145b9f2db1c748889
-				self.arm_move(x_a,y_a, 0, 0, 0, 0)
+				z_a = -14
+                                z_move=60
+				self.arm_move(x_a,y_a,z_move , 0, 0, 0)
 				self.arm_move(x_a,y_a,z_a, 0, 0, 0)
 				time.sleep(7)
 				self.suction(1,1)
 				time.sleep(1)
 				self.suction(1,0)
-				self.arm_move(x_a,y_a,0, 0, 0, 0)
-				self.arm_move(self.place_x,self.place_y,0, 0, 0, 0)
-				self.arm_move(self.place_x,self.place_y,z_a, 0, 0, 0)
+				self.arm_move(x_a,y_a,z_move, 0, 0, 0)
+				self.arm_move(self.place_x,self.place_y,z_move, 0, 0, 0)
+				self.arm_move(self.place_x,self.place_y,-150, 0, 0, 0)
 				time.sleep(13)
 				self.suction(2,1)
 				time.sleep(1)
 				self.suction(2,0)
 				time.sleep(1)
-				self.arm_move(-4,-250,0, 0, 0, 0)
+				self.arm_move(-4,-250,z_move, 0, 0, 0)
 				time.sleep(3)
 				try:
 					self.linetrace_start()
