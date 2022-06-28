@@ -16,9 +16,10 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   cv_bridge
   image_transport
-  bringup
   camera_pkg_msgs
-  #opencv2
+  mg400_bringup
+  #camera_pkg
+   #opencv2
   )
   #find_package(OpenCV 3 REQUIRED)
   find_package(OpenCV 4 REQUIRED)
