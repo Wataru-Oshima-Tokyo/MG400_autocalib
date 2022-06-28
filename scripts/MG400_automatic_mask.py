@@ -9,8 +9,8 @@ from camera_pkg_msgs.msg import Coordinate
 import rospy
 import cv_bridge
 import numpy as np
-from bringup.srv import MovJ, DO, EnableRobot, DisableRobot, SpeedJ, AccJ
-from bringup.msg import ToolVectorActual
+from mg400_bringup.srv import MovJ, DO, EnableRobot, DisableRobot, SpeedJ, AccJ
+from mg400_bringup.msg import ToolVectorActual
 from std_srvs.srv import Empty
 from std_srvs.srv import EmptyResponse
 from sklearn.linear_model import LinearRegression
@@ -20,15 +20,15 @@ class MOVE:
 	def __init__(self):
 		print("start MG400")
 		self.filepath ="/home/woshima/catkin_ws/src/MG400_autocalib/calibration.txt"
-		self.arm_move =rospy.ServiceProxy('/bringup/srv/MovJ',MovJ)
-		self.set_SpeedJ =rospy.ServiceProxy('/bringup/srv/SpeedJ',SpeedJ)
-		self.set_AccJ =rospy.ServiceProxy('/bringup/srv/AccJ',AccJ)
-		self.arm_enable = rospy.ServiceProxy('/bringup/srv/EnableRobot',EnableRobot)
+		self.arm_move =rospy.ServiceProxy('/mg400_bringup/srv/MovJ',MovJ)
+		self.set_SpeedJ =rospy.ServiceProxy('/mg400_bringup/srv/SpeedJ',SpeedJ)
+		self.set_AccJ =rospy.ServiceProxy('/mg400_bringup/srv/AccJ',AccJ)
+		self.arm_enable = rospy.ServiceProxy('/mg400_bringup/srv/EnableRobot',EnableRobot)
                 self.linetrace_stop = rospy.ServiceProxy('/linetrace/stop',Empty)
                 self.linetrace_start = rospy.ServiceProxy('/linetrace/start',Empty)
-		self.robot_coordinate = rospy.Subscriber("/bringup/msg/ToolVectorActual", ToolVectorActual, self.robotCoordinate_callback)
-                self.arm_disable = rospy.ServiceProxy('/bringup/srv/DisableRobot',DisableRobot)
-		self.suction = rospy.ServiceProxy('/bringup/srv/DO', DO)
+		self.robot_coordinate = rospy.Subscriber("/mg400_bringup/msg/ToolVectorActual", ToolVectorActual, self.robotCoordinate_callback)
+                self.arm_disable = rospy.ServiceProxy('/mg400_bringup/srv/DisableRobot',DisableRobot)
+		self.suction = rospy.ServiceProxy('/mg400_bringup/srv/DO', DO)
 		self.sub = rospy.Subscriber("/objectdetection/coordinate", Coordinate, self.image_callback)
 		self.pub_move = rospy.Publisher("/autocalib/move", Int16, queue_size=10)
 		self.work_start_srv_ = rospy.Service('/mg400_work/start', Empty, self.work_start_service)
@@ -36,7 +36,7 @@ class MOVE:
 		self.work_stop_srv_ = rospy.Service('/mg400_work/stop', Empty, self.work_stop_service)
 		self.calib_start_srv = rospy.Service('/calibration/start', Empty, self.calib_start_service)
 		self.calib_stop_srv = rospy.Service('/calibration/stop', Empty, self.calib_stop_service)
-		self.sub_jointState = rospy.Subscriber('/bringup/srv/ok', Twist, self.twist_callback)
+		self.sub_jointState = rospy.Subscriber('/mg400_bringup/srv/ok', Twist, self.twist_callback)
 		self.camera_coordinate =np.array([[]])
 		self.now = time.time()
 		self.end = time.time()
