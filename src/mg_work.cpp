@@ -1,7 +1,7 @@
 #include <vector>
 #include <map>
-#include <bringup/robot.h>
-#include <bringup/commander.h>
+#include <mg400_bringup/robot.h>
+#include <mg400_bringup/commander.h>
 #include <ros/ros.h>
 // #include <camera_pkg/Coordinate.h>
 #include <geometry_msgs/Twist.h>
@@ -69,7 +69,7 @@ int main(int argc, char** argv){
     RobotMove rm;
     // bringup::MG400Robot bu;
     ros::Rate loop_rate(100);
-    bringup::EnableRobot en;
+    mg400_bringup::EnableRobot en;
     // bringup::DisableRobot dn;
     rm.sub = rm.nh.subscribe("cmd_vel",1000,&RobotMove::TwistCallBack, &rm);
     rm.start = rm.nh.advertiseService(rm.SERVICE_START, &RobotMove::robot_start_service, &rm);

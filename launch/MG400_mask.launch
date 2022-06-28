@@ -1,7 +1,8 @@
 <launch>
     
     <arg name="robot_ip" doc="IP of the controller" default="192.168.1.6"/>
-
+    <arg name="image_topic" default="/color/image_rect_raw"/>
+    <arg name="depth_topic" default="/depth/image_rect_raw"/>
     <param name="robot_description" textfile="$(find mg400_description)/urdf/mg400_description.urdf"/>
 
     <node name="mg400_bringup" pkg="mg400_bringup" type="mg400_bringup" output="screen">
@@ -12,16 +13,19 @@
 
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
     
-    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+    <!--include file="$(find realsense2_camera)/launch/rs_camera.launch">
 	  <arg name="align_depth"               default="true"/>
-     </include>
+     </include-->
 	<!-- <include file="$(find darknet_ros)/launch/darknet_ros.launch"/> -->
   <!-- <node name="specific_object" pkg="darknet_ros" type="specific_object"/> -->
     
      <node name="mask_deteciton"
 	pkg="camera_pkg"
 	type="mask_detect"
-	output="screen"/>	
+	output="screen">
+    <param name="image_topic" value="$(arg image_topic)"/>
+    <param name="depth_topic" value="$(arg depth_topic)"/>  
+    </node>	
      
     <node name="MG400_automatic_pickup"
         pkg="MG400_basic"
