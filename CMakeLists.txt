@@ -17,7 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   image_transport
   bringup
-  #camera_pkg
+  camera_pkg_msgs
   #opencv2
   )
   #find_package(OpenCV 3 REQUIRED)

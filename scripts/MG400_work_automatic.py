@@ -5,7 +5,7 @@ import cv2 as cv
 from sensor_msgs.msg import Image
 from std_msgs.msg import Int16
 from geometry_msgs.msg import Twist
-from darknet_ros_msgs.msg import Coordinate
+from camera_pkg_msgs.msg import Coordinate
 import rospy
 import cv_bridge
 import numpy as np
