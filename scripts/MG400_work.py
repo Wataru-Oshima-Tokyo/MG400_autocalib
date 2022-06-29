@@ -9,7 +9,7 @@ from camera_pkg_msgs.msg import Coordinate
 import rospy
 import cv_bridge
 import numpy as np
-from mg400_bringup.srv import MovJ, DO, EnableRobot, DisableRobot,Sync
+from mg400_bringup.srv import MovJ, DO, EnableRobot, DisableRobot,Sync, ClearError,JointMovJ
 from mg400_bringup.msg import ToolVectorActual
 from std_srvs.srv import Empty
 from std_srvs.srv import EmptyResponse
@@ -28,6 +28,8 @@ class MOVE:
 		self.arm_enable = rospy.ServiceProxy('/mg400_bringup/srv/EnableRobot',EnableRobot)
 		self.robot_coordinate = rospy.Subscriber("/mg400_bringup/msg/ToolVectorActual", ToolVectorActual, self.robotCoordinate_callback)
                 self.arm_disable = rospy.ServiceProxy('/mg400_bringup/srv/DisableRobot',DisableRobot)
+		self.clear_error = rospy.ServiceProxy('/mg400_bringup/srv/ClearError',ClearError)
+		self.joint_move = rospy.ServiceProxy('/mg400_bringup/srv/ClearError',JointMovJ)
 		self.sub = rospy.Subscriber("/camera_pkg/coordinate", Coordinate, self.image_callback)
 		self.pub_move = rospy.Publisher("/autocalib/move", Int16, queue_size=10)
 		self.work_start_srv_ = rospy.Service('/mg400_work/start', Empty, self.work_start_service)
@@ -56,6 +58,7 @@ class MOVE:
 		self.pre_x_r=0
 		self.pre_y_r=0
 		self.pre_z_r=0
+		 
 		self.temp_x_r = 0
 		self.temp_y_r = 0
 		self.temp_z_r = 0
@@ -72,8 +75,13 @@ class MOVE:
 		self.x_r_coefficient = [0,0,0]
 		self.y_r_coefficient = [0,0,0]
 		self.readCalibFile()
+		self.initialize()
 
-
+	def initialize(self):
+		self.arm_disable()
+		self.clear_error()
+		self.arm_enable()
+		self.joint_move(0,0,0,0)
 
 	def readCalibFile(self):
 		try:
@@ -157,10 +165,10 @@ class MOVE:
 				y_a += self.y_r_intercept
 				z_a = msg.z*self.z_r_coefficient + self.z_r_intercept
 				z_move = 60
-                                z_a = -14
+                                # z_a = -14
                                 # x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
 				# y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
-				_r=-120
+				_r=0
 				self.arm_move(x_a,y_a, z_move, _r, 0, 0)
 				self.arm_move(x_a,y_a,z_a, _r, 0, 0)
 				time.sleep(7)
