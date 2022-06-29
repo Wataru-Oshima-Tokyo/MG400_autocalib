@@ -159,14 +159,15 @@ class MOVE:
                                 z_a = -14
                                 # x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
 				# y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
-				self.arm_move(x_a,y_a, z_move, 0, 0, 0)
-				self.arm_move(x_a,y_a,z_a, 0, 0, 0)
+				_r=-120
+				self.arm_move(x_a,y_a, z_move, _r, 0, 0)
+				self.arm_move(x_a,y_a,z_a, _r, 0, 0)
 				time.sleep(7)
 				self.suction(1,1)
 				time.sleep)0.5)
-				self.arm_move(x_a,y_a,z_move, 0, 0, 0)
-				self.arm_move(self.place_x,self.place_y,z_move, 0, 0, 0)
-				self.arm_move(self.place_x,self.place_y,-150, 0, 0, 0)
+				self.arm_move(x_a,y_a,z_move, _r, 0, 0)
+				self.arm_move(self.place_x,self.place_y,z_move, _r, 0, 0)
+				self.arm_move(self.place_x,self.place_y,-150, _r, 0, 0)
 				time.sleep(13)
 				self.suction(1,0)
 				time.sleep(0.5)
@@ -174,7 +175,7 @@ class MOVE:
 				time.sleep(1)
 				self.suction(2,0)
 				time.sleep(1)
-				self.arm_move(-4,-250,z_move, 0, 0, 0)
+				self.arm_move(-4,-250,z_move, _r, 0, 0)
 				time.sleep(3)
 
 			elif msg.t =="R":
