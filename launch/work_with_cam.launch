@@ -13,7 +13,7 @@
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
     
      
-    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+    <!--include file="$(find realsense2_camera)/launch/rs_camera.launch">
       <arg name="depth_width"         default="640"/>
       <arg name="depth_height"        default="480"/>
       <arg name="enable_depth"        default="true"/>
@@ -27,7 +27,7 @@
 	  <arg name="ordered_pc"                default="true"/>
 	  <arg name="enable_sync"               default="true"/>
 	  <arg name="align_depth"               default="true"/>
-	</include>    
+	</include-->    
 
     <!-- <node name="pcl_ros" pkg="pcl_ros" type="convert_pointcloud_to_image" output="screen" args=" input:=/camera/depth/color/points">
         <remap from="output" to="/camera/depth/color/image_raw"/>
