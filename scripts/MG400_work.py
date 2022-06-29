@@ -29,7 +29,7 @@ class MOVE:
 		self.robot_coordinate = rospy.Subscriber("/mg400_bringup/msg/ToolVectorActual", ToolVectorActual, self.robotCoordinate_callback)
                 self.arm_disable = rospy.ServiceProxy('/mg400_bringup/srv/DisableRobot',DisableRobot)
 		self.clear_error = rospy.ServiceProxy('/mg400_bringup/srv/ClearError',ClearError)
-		self.joint_move = rospy.ServiceProxy('/mg400_bringup/srv/ClearError',JointMovJ)
+		self.joint_move = rospy.ServiceProxy('/mg400_bringup/srv/JointMovJ',JointMovJ)
 		self.sub = rospy.Subscriber("/camera_pkg/coordinate", Coordinate, self.image_callback)
 		self.pub_move = rospy.Publisher("/autocalib/move", Int16, queue_size=10)
 		self.work_start_srv_ = rospy.Service('/mg400_work/start', Empty, self.work_start_service)

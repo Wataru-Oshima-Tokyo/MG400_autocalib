@@ -9,7 +9,7 @@ from camera_pkg_msgs.msg import Coordinate
 import rospy
 import cv_bridge
 import numpy as np
-from mg400_bringup.srv import MovJ, DO, EnableRobot, DisableRobot, SpeedJ, AccJ
+from mg400_bringup.srv import MovJ, DO, EnableRobot, DisableRobot, SpeedJ, AccJ, Sync, ClearError,JointMovJ
 from mg400_bringup.msg import ToolVectorActual
 from std_srvs.srv import Empty
 from std_srvs.srv import EmptyResponse
@@ -32,6 +32,8 @@ class MOVE:
 		self.robot_coordinate = rospy.Subscriber("/mg400_bringup/msg/ToolVectorActual", ToolVectorActual, self.robotCoordinate_callback)
                 self.arm_disable = rospy.ServiceProxy('/mg400_bringup/srv/DisableRobot',DisableRobot)
 		self.suction = rospy.ServiceProxy('/mg400_bringup/srv/DO', DO)
+		self.clear_error = rospy.ServiceProxy('/mg400_bringup/srv/ClearError',ClearError)
+		self.joint_move = rospy.ServiceProxy('/mg400_bringup/srv/JointMovJ',JointMovJ)
 		self.sub = rospy.Subscriber("/objectdetection/coordinate", Coordinate, self.image_callback)
 		self.pub_move = rospy.Publisher("/autocalib/move", Int16, queue_size=10)
 		self.work_start_srv_ = rospy.Service('/mg400_work/start', Empty, self.work_start_service)
@@ -71,8 +73,14 @@ class MOVE:
 		self.readCalibFile()
 		self.set_SpeedJ(100)
 		self.set_AccJ(100)
+		self.initialize()
 		self.arm_move(4.20, -250, 30, 0, 0, 0)
-
+		
+	def initialize(self):
+		self.arm_disable()
+		self.clear_error()
+		self.arm_enable()
+		self.joint_move(0,0,0,0)
 
 
 	def readCalibFile(self):
