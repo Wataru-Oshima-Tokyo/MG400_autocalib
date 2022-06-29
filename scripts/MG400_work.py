@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # --*-- coding: utf-8 -*-
-
+import os
 import cv2 as cv
 from sensor_msgs.msg import Image
 from std_msgs.msg import Int16
@@ -19,8 +19,9 @@ import math
 class MOVE:
 	def __init__(self):
 		print("start MG400")
-		self.xy_filepath ="/home/woshima/catkin_ws/src/MG400_basic/xy_calibration.txt"
-		self.z_filepath ="/home/woshima/catkin_ws/src/MG400_basic/z_calibration.txt"
+                home = os.environ["HOME"]
+		self.xy_filepath = home + "/catkin_ws/src/MG400_basic/xy_calibration.txt"
+		self.z_filepath = home + "/catkin_ws/src/MG400_basic/z_calibration.txt"
 		self.arm_move =rospy.ServiceProxy('/mg400_bringup/srv/MovJ',MovJ)
 		self.suction =rospy.ServiceProxy('/mg400_bringup/srv/DOExecute',DO)
 		self.sync =rospy.ServiceProxy('/mg400_bringup/srv/Sync',Sync)
@@ -164,7 +165,7 @@ class MOVE:
 				self.arm_move(x_a,y_a,z_a, _r, 0, 0)
 				time.sleep(7)
 				self.suction(1,1)
-				time.sleep)0.5)
+				time.sleep(0.5)
 				self.arm_move(x_a,y_a,z_move, _r, 0, 0)
 				self.arm_move(self.place_x,self.place_y,z_move, _r, 0, 0)
 				self.arm_move(self.place_x,self.place_y,-150, _r, 0, 0)
