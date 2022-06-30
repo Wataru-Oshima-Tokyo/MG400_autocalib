@@ -79,9 +79,14 @@ class MOVE:
 
 	def initialize(self):
 		self.arm_disable()
-		self.clear_error()
-		self.arm_enable()
-		self.joint_move(0,0,0,0)
+		time.sleep(0.5)
+                self.clear_error()
+		time.sleep(0.5)
+                self.arm_enable()
+                time.sleep(1)
+		#self.joint_move(0,0,0,0)
+                #time.sleep(0.5)
+                self.arm_move(300,0,120,0)
 
 	def readCalibFile(self):
 		try:
@@ -169,14 +174,14 @@ class MOVE:
                                 # x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
 				# y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
 				_r=0
-				self.arm_move(x_a,y_a, z_move, _r, 0, 0)
-				self.arm_move(x_a,y_a,z_a, _r, 0, 0)
+				self.arm_move(x_a,y_a, z_move, _r)
+				self.arm_move(x_a,y_a,z_a, _r)
 				time.sleep(7)
 				self.suction(1,1)
 				time.sleep(0.5)
-				self.arm_move(x_a,y_a,z_move, _r, 0, 0)
-				self.arm_move(self.place_x,self.place_y,z_move, _r, 0, 0)
-				self.arm_move(self.place_x,self.place_y,-150, _r, 0, 0)
+				self.arm_move(x_a,y_a,z_move, _r)
+				self.arm_move(self.place_x,self.place_y,z_move, _r)
+				self.arm_move(self.place_x,self.place_y,-150, _r)
 				time.sleep(13)
 				self.suction(1,0)
 				time.sleep(0.5)
@@ -184,7 +189,7 @@ class MOVE:
 				time.sleep(1)
 				self.suction(2,0)
 				time.sleep(1)
-				self.arm_move(-4,-250,z_move, _r, 0, 0)
+				self.arm_move(-4,-250,z_move, _r)
 				time.sleep(3)
 
 			elif msg.t =="R":
