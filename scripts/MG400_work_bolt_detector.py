@@ -27,8 +27,6 @@ class MOVE:
 		self.set_SpeedJ =rospy.ServiceProxy('/mg400_bringup/srv/SpeedJ',SpeedJ)
 		self.set_AccJ =rospy.ServiceProxy('/mg400_bringup/srv/AccJ',AccJ)
 		self.arm_enable = rospy.ServiceProxy('/mg400_bringup/srv/EnableRobot',EnableRobot)
-                self.linetrace_stop = rospy.ServiceProxy('/linetrace/stop',Empty)
-                self.linetrace_start = rospy.ServiceProxy('/linetrace/start',Empty)
 		self.robot_coordinate = rospy.Subscriber("/mg400_bringup/msg/ToolVectorActual", ToolVectorActual, self.robotCoordinate_callback)
                 self.arm_disable = rospy.ServiceProxy('/mg400_bringup/srv/DisableRobot',DisableRobot)
 		self.suction = rospy.ServiceProxy('/mg400_bringup/srv/DO', DO)
@@ -142,12 +140,7 @@ class MOVE:
 					self.linetrace_stop()
 				except:
 					pass
-			else:
-				try:
-					self.linetrace_stop()
-				except:
-					pass
-				self.end = time.time() +15
+				self.end = time.time() +18
 				
 				self.arm_move(300, 0, 30, 0)
 				msgs = [msg.x, msg.y, msg.z]
@@ -176,6 +169,7 @@ class MOVE:
 				self.suction(2,0)
 				time.sleep(1)
 				self.arm_move(-4,-250,z_move, _r)
+				time.sleep(2)
 				self.initialize()
 				self.detection_start()
 
