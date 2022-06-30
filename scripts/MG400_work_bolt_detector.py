@@ -45,8 +45,7 @@ class MOVE:
 		self.now = time.time()
 		self.end = time.time()
 		self.calib = False
-		hz = 20
-		self.rate = rospy.Rate(hz)
+		self.rate = rospy.Rate(20)
                 self.move_stopper= False
 		self.camera_z = np.array([[]])
                 self.RUN = 0
