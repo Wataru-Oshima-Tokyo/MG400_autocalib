@@ -134,8 +134,9 @@ class MOVE:
 		self.now = time.time()
 # 		print("now ", self.now)
 # 		print("end ", self.end)
+
 		if  (msg.x !=0 and msg.y !=0):
-			if self.end > self.now:
+			if self.end < self.now:
 				self.end = time.time() +18
 				
 				self.arm_move(300, 0, 30, 0)
