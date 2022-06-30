@@ -168,6 +168,10 @@ class MOVE:
 				self.arm_move(-4,-250,z_move, _r)
 				time.sleep(2)
 				self.initialize()
+				while(self.end > self.now):
+					self.now = time.time()
+					time.sleep(0.3)
+
 				self.detection_start()
 
 		# self.last_clb_time_ = rospy.get_time()
