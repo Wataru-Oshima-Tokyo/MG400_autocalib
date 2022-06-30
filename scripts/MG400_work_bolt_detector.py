@@ -36,7 +36,7 @@ class MOVE:
 		self.robot_sync = rospy.ServiceProxy('/mg400_bringup/srv/Sync',Sync)
 		self.joint_move = rospy.ServiceProxy('/mg400_bringup/srv/JointMovJ',JointMovJ)
 		self.sub = rospy.Subscriber("/camera_pkg/coordinate", Coordinate, self.image_callback)
-		self.pub_move = rospy.Publisher("/autocalib/move", Int16, queue_size=10)
+		self.detection_start = rospy.ServiceProxy("/bolt_detection/start", Empty)
 		self.work_start_srv_ = rospy.Service('/mg400_work/start', Empty, self.work_start_service)
                 self.twist_pub = rospy.Subscriber('/MG400/cmd_vel', Twist, self.twist_callback)
 		self.work_stop_srv_ = rospy.Service('/mg400_work/stop', Empty, self.work_stop_service)
@@ -81,7 +81,7 @@ class MOVE:
 		self.arm_disable()
 		self.clear_error()
 		self.arm_enable()
-		time.sleep(5)
+		time.sleep(2)
 		# self.joint_move(0,0,0,0)
 
 
@@ -147,7 +147,7 @@ class MOVE:
 					self.linetrace_stop()
 				except:
 					pass
-				self.end = time.time() +30
+				self.end = time.time() +15
 				
 				self.arm_move(300, 0, 30, 0)
 				msgs = [msg.x, msg.y, msg.z]
@@ -170,14 +170,14 @@ class MOVE:
 				self.arm_move(x_a,y_a,z_move, _r)
 				self.arm_move(self.place_x,self.place_y,z_move, _r)
 				self.arm_move(self.place_x,self.place_y,-150, _r)
-				time.sleep(5)
+				time.sleep(3)
 				self.suction(2,1)
 				time.sleep(1)
 				self.suction(2,0)
 				time.sleep(1)
 				self.arm_move(-4,-250,z_move, _r)
-				time.sleep(3)
 				self.initialize()
+				self.detection_start()
 
 		# self.last_clb_time_ = rospy.get_time()
 
