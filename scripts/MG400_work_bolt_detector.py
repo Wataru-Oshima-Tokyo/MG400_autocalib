@@ -34,7 +34,7 @@ class MOVE:
 		self.suction = rospy.ServiceProxy('/mg400_bringup/srv/DO', DO)
 		self.clear_error = rospy.ServiceProxy('/mg400_bringup/srv/ClearError',ClearError)
 		self.joint_move = rospy.ServiceProxy('/mg400_bringup/srv/JointMovJ',JointMovJ)
-		self.sub = rospy.Subscriber("/objectdetection/coordinate", Coordinate, self.image_callback)
+		self.sub = rospy.Subscriber("/camera_pkg/coordinate", Coordinate, self.image_callback)
 		self.pub_move = rospy.Publisher("/autocalib/move", Int16, queue_size=10)
 		self.work_start_srv_ = rospy.Service('/mg400_work/start', Empty, self.work_start_service)
                 self.twist_pub = rospy.Subscriber('/MG400/cmd_vel', Twist, self.twist_callback)
@@ -80,7 +80,7 @@ class MOVE:
 		self.arm_disable()
 		self.clear_error()
 		self.arm_enable()
-		time.sleep(0.5)
+		time.sleep(1)
 		# self.joint_move(0,0,0,0)
 
 
