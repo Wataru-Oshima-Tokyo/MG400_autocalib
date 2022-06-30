@@ -3,7 +3,7 @@
 import os
 import cv2 as cv
 from sensor_msgs.msg import Image
-from std_msgs.msg import Int16
+from std_msgs.msg import Bool
 from geometry_msgs.msg import Twist
 from camera_pkg_msgs.msg import Coordinate
 import rospy
@@ -34,7 +34,7 @@ class MOVE:
 		self.robot_sync = rospy.ServiceProxy('/mg400_bringup/srv/Sync',Sync)
 		self.joint_move = rospy.ServiceProxy('/mg400_bringup/srv/JointMovJ',JointMovJ)
 		self.sub = rospy.Subscriber("/camera_pkg/coordinate", Coordinate, self.image_callback)
-		self.detection_start = rospy.ServiceProxy("/bolt_detection/start", Empty)
+		self.mg400_dsth = rospy.Publisher("/mg400/woking", Bool, queue_size=100)
 		self.work_start_srv_ = rospy.Service('/mg400_work/start', Empty, self.work_start_service)
                 self.twist_pub = rospy.Subscriber('/MG400/cmd_vel', Twist, self.twist_callback)
 		self.work_stop_srv_ = rospy.Service('/mg400_work/stop', Empty, self.work_stop_service)
@@ -45,8 +45,9 @@ class MOVE:
 		self.now = time.time()
 		self.end = time.time()
 		self.calib = False
-		self.hz = 20
-                self.move_stopper= True
+		hz = 20
+		self.rate = rospy.Rate(hz)
+                self.move_stopper= False
 		self.camera_z = np.array([[]])
                 self.RUN = 0
 		self.place_y=-352
@@ -137,6 +138,7 @@ class MOVE:
 
 		if  (msg.x !=0 and msg.y !=0):
 			if self.end < self.now:
+				self.move_stopper =True
 				self.end = time.time() +18
 				
 				self.arm_move(300, 0, 30, 0)
@@ -172,7 +174,7 @@ class MOVE:
 					self.now = time.time()
 					time.sleep(0.3)
 
-				self.detection_start()
+				self.move_stopper =False
 
 		# self.last_clb_time_ = rospy.get_time()
 
@@ -253,4 +255,7 @@ if __name__ == "__main__":
 	print("MG400_work start")
 	rospy.init_node('MG400_work')
 	mv = MOVE()
+	while not rospy.is_shutdown():
+		mv.mg400_dsth.publish(mv.move_stopper)
+		mv.rate.sleep()
 	rospy.spin()
