@@ -52,7 +52,6 @@ class MOVE:
 		self.place_y=-352
 		self.place_x=0
                 self.TIMEOUT = 0.5
-		rate = rospy.Rate(self.hz)
 		self.last_clb_time_ = rospy.get_time()
 		self.x_r =0
 		self.y_r =0
