@@ -73,18 +73,15 @@ class MOVE:
 		self.y_r_coefficient = [0,0,0]
 		self.readCalibFile()
 		self.set_SpeedJ(60)
-		self.set_AccJ(100)
+		self.set_AccJ(60)
 		self.initialize()
 		self.arm_move(4.20, -250, 30,0)
 
 	def initialize(self):
 		self.arm_disable()
-		self.robot_sync()
 		self.clear_error()
-		self.robot_sync()
 		self.arm_enable()
-		self.robot_sync()
-		time.sleep(1)
+		time.sleep(5)
 		# self.joint_move(0,0,0,0)
 
 
@@ -151,7 +148,7 @@ class MOVE:
 				except:
 					pass
 				self.end = time.time() +30
-				self.initialize()
+				
 				self.arm_move(300, 0, 30, 0)
 				msgs = [msg.x, msg.y, msg.z]
 				x_a, y_a =0,0
@@ -166,20 +163,21 @@ class MOVE:
 				_r =0
 				self.arm_move(x_a,y_a,z_move , _r)
 				self.arm_move(x_a,y_a,z_a, _r)
-				time.sleep(7)
+				time.sleep(3)
 				self.suction(1,1)
 				time.sleep(1)
 				self.suction(1,0)
 				self.arm_move(x_a,y_a,z_move, _r)
 				self.arm_move(self.place_x,self.place_y,z_move, _r)
 				self.arm_move(self.place_x,self.place_y,-150, _r)
-				time.sleep(13)
+				time.sleep(5)
 				self.suction(2,1)
 				time.sleep(1)
 				self.suction(2,0)
 				time.sleep(1)
 				self.arm_move(-4,-250,z_move, _r)
 				time.sleep(3)
+				self.initialize()
 
 		# self.last_clb_time_ = rospy.get_time()
 
