@@ -176,10 +176,6 @@ class MOVE:
 				time.sleep(1)
 				self.arm_move(-4,-250,z_move, _r)
 				time.sleep(3)
-				try:
-					self.linetrace_start()
-				except:
-					pass
 
 		# self.last_clb_time_ = rospy.get_time()
 

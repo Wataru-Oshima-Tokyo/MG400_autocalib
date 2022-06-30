@@ -29,7 +29,7 @@
      
     <node name="MG400_automatic_pickup"
         pkg="MG400_basic"
-        type="MG400_work_automatic.py"
+        type="MG400_work_linetrace.py"
         output="screen"/>	
 
 </launch>
