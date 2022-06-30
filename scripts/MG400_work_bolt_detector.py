@@ -34,7 +34,7 @@ class MOVE:
 		self.robot_sync = rospy.ServiceProxy('/mg400_bringup/srv/Sync',Sync)
 		self.joint_move = rospy.ServiceProxy('/mg400_bringup/srv/JointMovJ',JointMovJ)
 		self.sub = rospy.Subscriber("/camera_pkg/coordinate", Coordinate, self.image_callback)
-		self.mg400_dsth = rospy.Publisher("/mg400/woking", Bool, queue_size=100)
+		self.mg400_dsth = rospy.Publisher("/mg400/working", Bool, queue_size=100)
 		self.work_start_srv_ = rospy.Service('/mg400_work/start', Empty, self.work_start_service)
                 self.twist_pub = rospy.Subscriber('/MG400/cmd_vel', Twist, self.twist_callback)
 		self.work_stop_srv_ = rospy.Service('/mg400_work/stop', Empty, self.work_stop_service)
@@ -134,7 +134,7 @@ class MOVE:
 # 		print("now ", self.now)
 # 		print("end ", self.end)
 
-		if  (msg.x !=0 and msg.y !=0):
+		if  (msg.x !=0 and msg.y !=0 and not self.move_stopper):
 			if self.end < self.now:
 				self.move_stopper =True
 				self.end = time.time() +18
@@ -168,10 +168,6 @@ class MOVE:
 				self.arm_move(-4,-250,z_move, _r)
 				time.sleep(2)
 				self.initialize()
-				while(self.end > self.now):
-					self.now = time.time()
-					time.sleep(0.3)
-
 				self.move_stopper =False
 
 		# self.last_clb_time_ = rospy.get_time()
