@@ -50,6 +50,7 @@ class MOVE:
 		self.count=0
 		self.place_y=-352
 		self.place_x=0
+                self.r_coordinate= 180
 		rate = rospy.Rate(self.hz)
 		self.last_clb_time_ = rospy.get_time()
 		self.x_r =0
@@ -86,7 +87,7 @@ class MOVE:
                 time.sleep(1)
 		#self.joint_move(0,0,0,0)
                 #time.sleep(0.5)
-                self.arm_move(300,0,120,0)
+                self.arm_move(300,0,120,self.r_coordinate)
 
 	def readCalibFile(self):
 		try:
@@ -134,7 +135,7 @@ class MOVE:
 		else:
 			self.y_r -= msg.linear.x
 		self.y_r += msg.angular.z
-		self.arm_move(self.x_r, self.y_r, 0, 0, 0, 0)
+		self.arm_move(self.x_r, self.y_r, self.r_coordinate)
 
 	def image_callback(self, msg):
 		#initial postion for MG400 in image coordinate is 566(x),145(y) and robot coordination is (300, 0)
@@ -173,7 +174,7 @@ class MOVE:
                                 # z_a = -14
                                 # x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
 				# y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
-				_r=0
+				_r=self.r_coordinate
 				self.arm_move(x_a,y_a, z_move, _r)
 				self.arm_move(x_a,y_a,z_a, _r)
 				time.sleep(7)
@@ -266,7 +267,7 @@ class MOVE:
 		self.RUN = 1
                 self.arm_enable()
 		self.pos_x =300
-		first_move = self.arm_move(self.pos_x, 0, 0, 0, 0, 0)
+		first_move = self.arm_move(self.pos_x, self.r_coordinate)
 		time.sleep(1)
                 self.last_clb_time_ = rospy.get_time()
 		return EmptyResponse()

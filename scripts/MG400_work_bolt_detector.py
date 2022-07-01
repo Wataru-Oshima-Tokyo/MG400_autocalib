@@ -34,7 +34,7 @@ class MOVE:
 		#self.robot_sync = rospy.ServiceProxy('/mg400_bringup/srv/Sync',Sync)
 		self.joint_move = rospy.ServiceProxy('/mg400_bringup/srv/JointMovJ',JointMovJ)
 		self.sub = rospy.Subscriber("/camera_pkg/coordinate", Coordinate, self.image_callback)
-		self.mg400_dsth = rospy.Publisher("/mg400/working", Bool, queue_size=100)
+		self.mg400_dsth = rospy.Publisher("/mg400/working", Bool, queue_size=1000)
 		self.work_start_srv_ = rospy.Service('/mg400_work/start', Empty, self.work_start_service)
                 self.twist_pub = rospy.Subscriber('/MG400/cmd_vel', Twist, self.twist_callback)
 		self.robot_mode_sub = rospy.Subscriber('/mg400_bringup/msg/RobotStatus', RobotStatus, self.robotStatus_callback)
@@ -47,12 +47,14 @@ class MOVE:
 		self.end = time.time()
 		self.calib = False
 		self.robot_mode = 0
+                self.robot_mode_prev = 0
 		self.rate = rospy.Rate(20)
                 self.move_stopper= True
 		self.camera_z = np.array([[]])
                 self.RUN = 0
-		self.place_y=-352
-		self.place_x=0
+		self.place_y=407
+		self.place_x=23
+                self.r_coordinate = 180
                 self.TIMEOUT = 0.5
 		self.last_clb_time_ = rospy.get_time()
 		self.x_r =0
@@ -71,10 +73,12 @@ class MOVE:
 		self.x_r_coefficient = [0,0,0]
 		self.y_r_coefficient = [0,0,0]
 		self.readCalibFile()
-		self.set_SpeedJ(60)
-		self.set_AccJ(60)
+		self.set_SpeedJ(40)
+		self.set_AccJ(40)
+                while self.robot_mode == 0:
+                    self.rate.sleep()
 		self.initialize()
-		self.arm_move(4.20, -250, 30,0)
+		self.arm_move(self.place_x ,self.place_y,60, self.r_coordinate)
 		self.sync_robot()
 		self.move_stopper = False
 
@@ -82,7 +86,9 @@ class MOVE:
 		self.arm_disable()
 		self.clear_error()
 		self.arm_enable()
-		time.sleep(2)
+                time.sleep(2)
+                while self.robot_mode !=5:
+                    self.rate.sleep()
 		# self.joint_move(0,0,0,0)
 
 
@@ -135,8 +141,14 @@ class MOVE:
 		self.robot_mode = robot_status.robot_status
 
 	def sync_robot(self):
-		while(self.robot_mode == 7):
-			self.rate.sleep()
+                if self.robot_mode == 9:
+                    self.initialize()
+                time.sleep(0.5)
+                while self.robot_mode !=5:
+                    if self.robot_mode == 9:
+                        self.initialize()
+                        break
+                    self.rate.sleep()
 			
 	def robotCoordinate_callback(self, coordinate):
 		self.x_r = coordinate.x
@@ -149,7 +161,7 @@ class MOVE:
 		else:
 			self.y_r -= msg.linear.x
 		self.y_r += msg.angular.z
-		self.arm_move(self.x_r, self.y_r, 0)
+		self.arm_move(self.x_r, self.y_r, self.r_coordinate)
 
         def image_callback(self, msg):
 # 		print("get the message")
@@ -158,10 +170,10 @@ class MOVE:
 # 		print("end ", self.end)
 
 		if  (msg.x !=0 and msg.y !=0 and not self.move_stopper):
-				if self.robot_mode == 9:
-					self.initialize()
-				self.move_stopper =True				
-				self.arm_move(300, 0, 30, 0)
+				self.move_stopper = True
+                                if self.robot_mode == 9:
+					self.initialize()			
+				self.arm_move(300, 0, 30, self.r_coordinate)
 				msgs = [msg.x, msg.y, msg.z]
 				x_a, y_a =0,0
 				for i in range(len(self.x_r_coefficient)):
@@ -172,23 +184,23 @@ class MOVE:
 				z_a = msg.z*self.z_r_coefficient + self.z_r_intercept
 				# z_a = -14
                                 z_move=60
-				_r =0
-				self.arm_move(x_a,y_a,z_move , _r)
+				_r = self.r_coordinate
+				self.suction(2,1)
+                                self.arm_move(x_a,y_a,z_move , _r)
 				self.sync_robot()
 				self.arm_move(x_a,y_a,z_a, _r)
 				self.sync_robot()
-				self.suction(1,1)
-				self.sync_robot()
-				self.suction(1,0)
-				self.arm_move(x_a,y_a,z_move, _r)
-				self.arm_move(self.place_x,self.place_y,z_move, _r)
-				self.arm_move(self.place_x,self.place_y,-150, _r)
-				self.sync_robot()
-				self.suction(2,1)
-				self.sync_robot()
 				self.suction(2,0)
+				self.arm_move(x_a,y_a,z_move, _r)
 				self.sync_robot()
-				self.arm_move(-4,-250,z_move, _r)
+                                self.arm_move(self.place_x,self.place_y,z_move, _r+90)
+				self.sync_robot()
+                                self.arm_move(self.place_x,self.place_y,-150, _r+90)
+				self.sync_robot()
+				self.suction(1,1)
+				self.arm_move(self.place_x,self.place_y-20,-150, _r+90)
+                                self.suction(1,0)
+				self.arm_move(self.place_x,self.place_y,z_move, _r+90)
 				self.sync_robot()
 				self.move_stopper =False
 
@@ -244,7 +256,7 @@ class MOVE:
 		self.RUN = 1
                 self.arm_enable()
 		self.pos_x =300
-		first_move = self.arm_move(self.pos_x, 0, 0, 0)
+		first_move = self.arm_move(self.pos_x, 0, 0, self.r_coordinate)
 		time.sleep(1)
                 self.last_clb_time_ = rospy.get_time()
 		return EmptyResponse()
