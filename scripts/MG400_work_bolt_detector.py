@@ -10,7 +10,7 @@ import rospy
 import cv_bridge
 import numpy as np
 from mg400_bringup.srv import MovJ, DO, EnableRobot, DisableRobot, SpeedJ, AccJ, Sync, ClearError,JointMovJ
-from mg400_bringup.msg import ToolVectorActual
+from mg400_bringup.msg import ToolVectorActual, RobotStatus
 from std_srvs.srv import Empty
 from std_srvs.srv import EmptyResponse
 from sklearn.linear_model import LinearRegression
@@ -37,7 +37,7 @@ class MOVE:
 		self.mg400_dsth = rospy.Publisher("/mg400/working", Bool, queue_size=100)
 		self.work_start_srv_ = rospy.Service('/mg400_work/start', Empty, self.work_start_service)
                 self.twist_pub = rospy.Subscriber('/MG400/cmd_vel', Twist, self.twist_callback)
-		self.robot_mode_sub = rospy.Subscriber('/mg400_bringup/msg/RobotStatus', Twist, self.robotStatus_callback)
+		self.robot_mode_sub = rospy.Subscriber('/mg400_bringup/msg/RobotStatus', RobotStatus, self.robotStatus_callback)
 		self.work_stop_srv_ = rospy.Service('/mg400_work/stop', Empty, self.work_stop_service)
 		self.calib_start_srv = rospy.Service('/calibration/start', Empty, self.calib_start_service)
 		self.calib_stop_srv = rospy.Service('/calibration/stop', Empty, self.calib_stop_service)
@@ -132,7 +132,7 @@ class MOVE:
 			10:	"ROBOT_MODE_PAUSE",
 			11:	"ROBOT_MODE_JOG"
 		"""
-		self.robot_mode = robot_status
+		self.robot_mode = robot_status.robot_status
 
 	def sync_robot(self):
 		while(self.robot_mode == 7):
