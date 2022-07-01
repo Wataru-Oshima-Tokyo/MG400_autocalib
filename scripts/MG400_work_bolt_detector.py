@@ -37,6 +37,7 @@ class MOVE:
 		self.mg400_dsth = rospy.Publisher("/mg400/working", Bool, queue_size=100)
 		self.work_start_srv_ = rospy.Service('/mg400_work/start', Empty, self.work_start_service)
                 self.twist_pub = rospy.Subscriber('/MG400/cmd_vel', Twist, self.twist_callback)
+		self.robot_mode_sub = rospy.Subscriber('/mg400_bringup/msg/RobotStatus', Twist, self.robotStatus_callback)
 		self.work_stop_srv_ = rospy.Service('/mg400_work/stop', Empty, self.work_stop_service)
 		self.calib_start_srv = rospy.Service('/calibration/start', Empty, self.calib_start_service)
 		self.calib_stop_srv = rospy.Service('/calibration/stop', Empty, self.calib_stop_service)
@@ -45,8 +46,9 @@ class MOVE:
 		self.now = time.time()
 		self.end = time.time()
 		self.calib = False
+		self.robot_mode = 0
 		self.rate = rospy.Rate(20)
-                self.move_stopper= False
+                self.move_stopper= True
 		self.camera_z = np.array([[]])
                 self.RUN = 0
 		self.place_y=-352
@@ -73,6 +75,8 @@ class MOVE:
 		self.set_AccJ(60)
 		self.initialize()
 		self.arm_move(4.20, -250, 30,0)
+		self.sync_robot()
+		self.move_stopper = False
 
 	def initialize(self):
 		self.arm_disable()
@@ -114,7 +118,26 @@ class MOVE:
 			
 
 			
+	def robotStatus_callback(self, robot_status):
+		"""
+		    1:	"ROBOT_MODE_INIT",
+			2:	"ROBOT_MODE_BRAKE_OPEN",
+			3:	"",
+			4:	"ROBOT_MODE_DISABLED",
+			5:	"ROBOT_MODE_ENABLE",
+			6:	"ROBOT_MODE_BACKDRIVE",
+			7:	"ROBOT_MODE_RUNNING",
+			8:	"ROBOT_MODE_RECORDING",
+			9:	"ROBOT_MODE_ERROR",
+			10:	"ROBOT_MODE_PAUSE",
+			11:	"ROBOT_MODE_JOG"
+		"""
+		self.robot_mode = robot_status
 
+	def sync_robot(self):
+		while(self.robot_mode == 7):
+			self.rate.sleep()
+			
 	def robotCoordinate_callback(self, coordinate):
 		self.x_r = coordinate.x
 		self.y_r = coordinate.y
@@ -135,10 +158,9 @@ class MOVE:
 # 		print("end ", self.end)
 
 		if  (msg.x !=0 and msg.y !=0 and not self.move_stopper):
-			if self.end < self.now:
-				self.move_stopper =True
-				self.end = time.time() +18
-				
+				if self.robot_mode == 9:
+					self.initialize()
+				self.move_stopper =True				
 				self.arm_move(300, 0, 30, 0)
 				msgs = [msg.x, msg.y, msg.z]
 				x_a, y_a =0,0
@@ -152,22 +174,22 @@ class MOVE:
                                 z_move=60
 				_r =0
 				self.arm_move(x_a,y_a,z_move , _r)
+				self.sync_robot()
 				self.arm_move(x_a,y_a,z_a, _r)
-				time.sleep(3)
+				self.sync_robot()
 				self.suction(1,1)
-				time.sleep(1)
+				self.sync_robot()
 				self.suction(1,0)
 				self.arm_move(x_a,y_a,z_move, _r)
 				self.arm_move(self.place_x,self.place_y,z_move, _r)
 				self.arm_move(self.place_x,self.place_y,-150, _r)
-				time.sleep(3)
+				self.sync_robot()
 				self.suction(2,1)
-				time.sleep(1)
+				self.sync_robot()
 				self.suction(2,0)
-				time.sleep(1)
+				self.sync_robot()
 				self.arm_move(-4,-250,z_move, _r)
-				time.sleep(2)
-				self.initialize()
+				self.sync_robot()
 				self.move_stopper =False
 
 		# self.last_clb_time_ = rospy.get_time()
