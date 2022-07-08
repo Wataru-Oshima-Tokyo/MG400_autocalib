@@ -3,7 +3,7 @@
 import os
 import cv2 as cv
 from sensor_msgs.msg import Image
-from std_msgs.msg import Int16
+from std_msgs.msg import Bool
 from geometry_msgs.msg import Twist
 from camera_pkg_msgs.msg import Coordinate
 import rospy
