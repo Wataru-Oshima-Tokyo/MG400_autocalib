@@ -9,8 +9,8 @@ from camera_pkg_msgs.msg import Coordinate
 import rospy
 import cv_bridge
 import numpy as np
-from mg400_bringup.srv import MovJ, DO, EnableRobot, DisableRobot,Sync, ClearError,JointMovJ
-from mg400_bringup.msg import ToolVectorActual
+from mg400_bringup.srv import MovJ, DO, EnableRobot, DisableRobot, SpeedJ, AccJ, Sync, ClearError,JointMovJ
+from mg400_bringup.msg import ToolVectorActual, RobotStatus
 from std_srvs.srv import Empty
 from std_srvs.srv import EmptyResponse
 from sklearn.linear_model import LinearRegression
