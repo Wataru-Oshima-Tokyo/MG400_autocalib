@@ -46,7 +46,8 @@ class MOVE:
 		self.camera_coordinate =np.array([[]])
 		self.now = time.time()
 		self.end = time.time()
-		self.calib = False
+		self.xy_calib = False
+		self.z_calib = False
 		self.robot_mode = 0
                 self.robot_mode_prev = 0
 		self.rate = rospy.Rate(20)
