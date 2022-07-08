@@ -32,7 +32,7 @@ class MOVE:
 		self.clear_error = rospy.ServiceProxy('/mg400_bringup/srv/ClearError',ClearError)
 		#self.robot_sync = rospy.ServiceProxy('/mg400_bringup/srv/Sync',Sync)
 		self.joint_move = rospy.ServiceProxy('/mg400_bringup/srv/JointMovJ',JointMovJ)
-		self.sub = rospy.Subscriber("/camera_pkg/coordinate", Coordinate, self.image_callback)
+		self.sub = rospy.Subscriber("/outlet/coordinate", Coordinate, self.image_callback)
 		self.mg400_dsth = rospy.Publisher("/mg400/working", Bool, queue_size=1000)
 		self.work_start_srv_ = rospy.Service('/mg400_work/start', Empty, self.work_start_service)
                 self.twist_pub = rospy.Subscriber('/MG400/cmd_vel', Twist, self.twist_callback)
