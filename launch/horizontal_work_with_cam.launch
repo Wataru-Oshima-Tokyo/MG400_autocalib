@@ -1,0 +1,30 @@
+<launch>
+    
+    <arg name="robot_ip" doc="IP of the controller" default="192.168.1.6"/>
+    <arg name="image_topic" default="/color/image_rect_raw"/>
+    <arg name="depth_topic" default="/depth/image_rect_raw"/>
+    <param name="robot_description" textfile="$(find mg400_description)/urdf/mg400_description.urdf"/>
+
+    <node name="mg400_bringup" pkg="mg400_bringup" type="mg400_bringup" output="screen">
+        <param name="joint_publish_rate" type="double" value="10"/>
+        <param name="trajectory_duration" type="double" value="0.3"/>
+        <param name="robot_ip_address" type="str" value="$(arg robot_ip)"/>
+    </node>
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+    
+
+    <node name="camera_pkg"
+        pkg="camera_pkg"
+        type="ros_rgbd"
+        output="screen">
+    <param name="image_topic" value="$(arg image_topic)"/>
+    <param name="depth_topic" value="$(arg depth_topic)"/> 
+    </node>
+        
+    <node name="MG400_calibration"
+        pkg="MG400_basic"
+        type="MG400_work_horizontal.py"
+        output="screen"/>
+                                    
+</launch>
