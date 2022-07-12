@@ -212,9 +212,10 @@ class MOVE:
 				self.sync_robot()
 				self.arm_move(x_a,y_a,z_a, _r)
 				self.sync_robot()
-				self.arm_move(x_a-50,y_a,z_a, _r)
-				self.sync_robot()
-				self.arm_move(x_a-50,y_a,120, _r)
+				self.mg400_dsth.publish(False)
+				# self.arm_move(x_a-50,y_a,z_a, _r)
+				# self.sync_robot()
+				# self.arm_move(x_a-50,y_a,120, _r)
 
 
 			elif msg.t =="R":
