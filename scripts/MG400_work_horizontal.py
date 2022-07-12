@@ -201,9 +201,9 @@ class MOVE:
 				for i in range(len(self.x_r_coefficient)):
 					x_a += msgs[i]*self.x_r_coefficient[i]
 					y_a += msgs[i]*self.y_r_coefficient[i]
-				x_a += self.x_r_intercept
-				y_a += self.y_r_intercept
-				z_a = msg.z*self.z_r_coefficient + self.z_r_intercept
+				x_a += self.x_r_intercept +5
+				y_a += self.y_r_intercept +5
+				z_a = msg.z*self.z_r_coefficient + self.z_r_intercept +5
                                 # z_a = -14
                                 # x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
 				# y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
