@@ -65,6 +65,7 @@ class MOVE:
 		self.x_i =0
 		self.y_i =0
 		self.z_i =0
+		self.Move = False
 		self.x_r_arr =[]
 		self.y_r_arr =[]
 		self.z_r_arr =[]
@@ -140,14 +141,15 @@ class MOVE:
 		self.robot_mode = robot_status.robot_status
 
 	def sync_robot(self):
-                if self.robot_mode == 9:
-                    self.initialize()
-                time.sleep(0.5)
-                while self.robot_mode !=5:
-                    if self.robot_mode == 9:
-                        self.initialize()
-                        break
-                    self.rate.sleep()
+			if self.robot_mode == 9:
+				self.initialize()
+			time.sleep(0.5)
+			while self.robot_mode !=5:
+				if self.robot_mode == 9:
+					self.initialize()
+					break
+				self.rate.sleep()
+			self.Move = False				
 	
 	
 	def getRobotCoordinate(self):
@@ -166,6 +168,7 @@ class MOVE:
 		z = self.temp_z_r + msg.linear.z
 		r = self.r_coordinate + msg.angular.z
 		self.arm_move(x, y, z, r)
+		self.Move =True
 		self.sync_robot()
 
 	def image_callback(self, msg):
