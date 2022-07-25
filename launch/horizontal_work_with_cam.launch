@@ -13,7 +13,12 @@
 
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
     
-
+    <node name="usbcam"
+        pkg="camera_pkg"
+        type="pub_image_python.py"
+        output="screen">
+    </node>
+    
     <node name="camera_pkg"
         pkg="camera_pkg"
         type="ros_rgbd"
