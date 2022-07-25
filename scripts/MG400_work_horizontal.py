@@ -161,12 +161,11 @@ class MOVE:
 		self.temp_z_r = coordinate.z
 
 	def twist_callback(self, msg):
-		if msg.angular.z>0:
-			self.y_r += msg.linear.x
-		else:
-			self.y_r -= msg.linear.x
-		self.y_r += msg.angular.z
-		self.arm_move(self.x_r, self.y_r, self.r_coordinate)
+		x = self.temp_x_r + msg.linear.x
+		y = self.temp_y_r + msg.linear.y
+		z = self.temp_z_r + msg.linear.z
+		r = self.r_coordinate + msg.angular.z
+		self.arm_move(x, y, z, r)
 
 	def image_callback(self, msg):
 		#initial postion for MG400 in image coordinate is 566(x),145(y) and robot coordination is (300, 0)
