@@ -167,7 +167,8 @@ class MOVE:
 		y = self.temp_y_r + msg.linear.y
 		z = self.temp_z_r + msg.linear.z
 		r = self.r_coordinate + msg.angular.z
-		self.arm_move(x, y, z, r)
+		if not self.Move:
+			self.arm_move(x, y, z, r)
 		self.Move =True
 		self.sync_robot()
 
