@@ -33,7 +33,7 @@ class MOVE:
 		#self.robot_sync = rospy.ServiceProxy('/mg400_bringup/srv/Sync',Sync)
 		self.joint_move = rospy.ServiceProxy('/mg400_bringup/srv/JointMovJ',JointMovJ)
 		self.sub = rospy.Subscriber("/outlet/coordinate", Coordinate, self.image_callback)
-		self.mg400_dsth = rospy.Publisher("/mg400/working", Bool, queue_size=1000)
+		self.mg400_dsth = rospy.Publisher("/mg400/working", Bool, queue_size=100)
 		self.work_start_srv_ = rospy.Service('/mg400_work/start', Empty, self.work_start_service)
                 self.twist_pub = rospy.Subscriber('/MG400/cmd_vel', Twist, self.twist_callback)
 		self.robot_mode_sub = rospy.Subscriber('/mg400_bringup/msg/RobotStatus', RobotStatus, self.robotStatus_callback)
@@ -169,9 +169,9 @@ class MOVE:
 		z = self.temp_z_r + msg.linear.z
 		r = self.r_coordinate + msg.angular.z
 		if not self.Move:
+			self.Move =True
 			self.arm_move(x, y, z, r)
-		self.Move =True
-		self.sync_robot()
+			self.sync_robot()
 
 	def image_callback(self, msg):
 		#initial postion for MG400 in image coordinate is 566(x),145(y) and robot coordination is (300, 0)
