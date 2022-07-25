@@ -166,6 +166,7 @@ class MOVE:
 		z = self.temp_z_r + msg.linear.z
 		r = self.r_coordinate + msg.angular.z
 		self.arm_move(x, y, z, r)
+		self.sync_robot()
 
 	def image_callback(self, msg):
 		#initial postion for MG400 in image coordinate is 566(x),145(y) and robot coordination is (300, 0)
@@ -277,6 +278,7 @@ class MOVE:
 		self.z_r_arr =[]
 
 		
+
 
 
 
