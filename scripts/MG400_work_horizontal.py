@@ -206,14 +206,13 @@ class MOVE:
 				for i in range(len(self.x_r_coefficient)):
 					x_a += msgs[i]*self.x_r_coefficient[i]
 					y_a += msgs[i]*self.y_r_coefficient[i]
-				x_a += self.x_r_intercept
-				y_a += self.y_r_intercept
-				z_a = msg.z*self.z_r_coefficient + self.z_r_intercept
+				self.x_a += self.x_r_intercept
+				self.y_a += self.y_r_intercept
+				self.z_a = msg.z*self.z_r_coefficient + self.z_r_intercept
                                 # z_a = -14
                                 # x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
 				# y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
-				_r=self.r_coordinate
-				self.arm_move(x_a-50,y_a, z_a, _r)
+				self.arm_move(self.x_a-50,self.y_a, self.z_a, self.r_coordinate)
 				self.sync_robot()
 				# self.arm_move(x_a,y_a,z_a, _r)
 				# self.sync_robot()
@@ -227,7 +226,11 @@ class MOVE:
 				self.xy_calib_start_service(Empty)
 			elif msg.t =="M":
 				self.z_calib_start_service(Empty)
-
+			elif msg.t =="F":
+				self.getRobotCoordinate()
+				self.arm_move(self.x_r,self.y_r, self.z_a, self.r_coordinate)
+				self.sync_robot()
+				
 		self.last_clb_time_ = rospy.get_time()
 
 	def cancelAppend(self):
