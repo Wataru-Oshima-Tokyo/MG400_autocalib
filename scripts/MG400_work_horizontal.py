@@ -58,7 +58,10 @@ class MOVE:
 		self.place_x=300
                 self.r_coordinate = 223
                 self.TIMEOUT = 0.5
-		self.last_clb_time_ = rospy.get_time()
+		self.ast_clb_time_ = rospy.get_time()
+		self.x_a =0
+		self.y_a =0
+		self.z_a =0
 		self.x_r =0
 		self.y_r =0
 		self.z_r =0
