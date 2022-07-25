@@ -81,6 +81,7 @@ class MOVE:
                 while self.robot_mode == 0:
                     self.rate.sleep()
 		self.initialize()
+		time.sleep(2)
 		self.arm_move(self.place_x ,self.place_y,60, self.r_coordinate)
 		self.sync_robot()
 		self.move_stopper = False
