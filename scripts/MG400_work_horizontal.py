@@ -210,8 +210,8 @@ class MOVE:
 				_r=self.r_coordinate
 				self.arm_move(x_a-50,y_a, z_a, _r)
 				self.sync_robot()
-				self.arm_move(x_a,y_a,z_a, _r)
-				self.sync_robot()
+				# self.arm_move(x_a,y_a,z_a, _r)
+				# self.sync_robot()
 				self.mg400_dsth.publish(False)
 				# self.arm_move(x_a-50,y_a,z_a, _r)
 				# self.sync_robot()
