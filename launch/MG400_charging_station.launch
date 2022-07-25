@@ -25,7 +25,7 @@
     <param name="usbcam_topic" value="$(arg usbcam_topic)"/>
     </node>
         
-    <node name="MG400_calibration"
+    <node name="MG400_horizontal_move"
         pkg="MG400_basic"
         type="MG400_work_horizontal.py"
         output="screen"/>
