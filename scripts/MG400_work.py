@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # --*-- coding: utf-8 -*-
 import os
+from xmlrpc.client import FastMarshaller
 import cv2 as cv
 from sensor_msgs.msg import Image
 from std_msgs.msg import Bool
@@ -81,6 +82,8 @@ class MOVE:
 		self.arm_move(self.place_x ,self.place_y,60, self.r_coordinate)
 		self.sync_robot()
 		self.move_stopper = False
+		self.xy_calib = False
+		self.z_calib = False
 
 	def initialize(self):
 		self.arm_disable()
