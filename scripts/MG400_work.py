@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # --*-- coding: utf-8 -*-
 import os
-from xmlrpc.client import FastMarshaller
 import cv2 as cv
 from sensor_msgs.msg import Image
 from std_msgs.msg import Bool
