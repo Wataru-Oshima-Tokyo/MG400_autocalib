@@ -220,12 +220,7 @@ class MOVE:
 			elif msg.t =="R":
 				self.xy_calib_start_service(Empty)
 			elif msg.t =="M":
-				self.z_calib_start_service(Empty)
-			self.count+=1
-			self.place_x += 40
-			if self.count%3 ==0:
-				self.place_y +=40
-				self.place_x=0 
+				self.z_calib_start_service(Empty) 
 			
 
 		self.last_clb_time_ = rospy.get_time()
