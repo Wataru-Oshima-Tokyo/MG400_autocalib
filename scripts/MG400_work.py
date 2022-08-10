@@ -39,8 +39,8 @@ class MOVE:
 		self.twist_pub = rospy.Subscriber('/MG400/cmd_vel', Twist, self.twist_callback)
 		self.robot_mode_sub = rospy.Subscriber('/mg400_bringup/msg/RobotStatus', RobotStatus, self.robotStatus_callback)
 		self.work_stop_srv_ = rospy.Service('/mg400_work/stop', Empty, self.work_stop_service)
-		self.calib_start_srv = rospy.Service('/calibration/start', Empty, self.calib_start_service)
-		self.calib_stop_srv = rospy.Service('/calibration/stop', Empty, self.calib_stop_service)
+		# self.calib_start_srv = rospy.Service('/calibration/start', Empty, self.calib_start_service)
+		# self.calib_stop_srv = rospy.Service('/calibration/stop', Empty, self.calib_stop_service)
 		self.sub_jointState = rospy.Subscriber('/mg400_bringup/srv/ok', Twist, self.twist_callback)
 		self.camera_coordinate =np.array([[]])
 		self.now = time.time()
@@ -206,14 +206,14 @@ class MOVE:
 				z_a = msg.z*self.z_r_coefficient + self.z_r_intercept
 				# z_a = -14
 				z_move=60
-				self.suction(2,1)
+				# self.suction(2,1)
 				self.arm_move(x_a,y_a,z_move , self.r_coordinate)
 				self.sync_robot()
 				self.arm_move(x_a,y_a,z_a, self.r_coordinate)
 				self.sync_robot()
-				self.suction(2,0)
-				self.arm_move(x_a,y_a,z_move, self.r_coordinate)
-				self.sync_robot()
+				# self.suction(2,0)
+				# self.arm_move(x_a,y_a,z_move, self.r_coordinate)
+				# self.sync_robot()
 
 			elif msg.t =="R":
 				self.xy_calib_start_service(Empty)
