@@ -20,8 +20,8 @@ class MOVE:
 	def __init__(self):
 		print("start MG400")
                 home = os.environ["HOME"]
-                self.xy_filepath = home + "/catkin_ws/src/MG400_basic/xy_calibration.txt"
-                self.z_filepath = home + "/catkin_ws/src/MG400_basic/z_calibration.txt"
+                self.xy_filepath = home + "/catkin_ws/src/MG400_basic/files/xy_calibration.txt"
+                self.z_filepath = home + "/catkin_ws/src/MG400_basic/files/z_calibration.txt"
 
 		self.arm_move =rospy.ServiceProxy('/mg400_bringup/srv/MovJ',MovJ)
 		self.set_SpeedJ =rospy.ServiceProxy('/mg400_bringup/srv/SpeedJ',SpeedJ)

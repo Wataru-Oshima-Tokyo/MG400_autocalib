@@ -3,14 +3,14 @@
 import os
 import cv2 as cv
 from sensor_msgs.msg import Image
-from std_msgs.msg import Int16
+from std_msgs.msg import Bool
 from geometry_msgs.msg import Twist
 from camera_pkg_msgs.msg import Coordinate
 import rospy
 import cv_bridge
 import numpy as np
-from mg400_bringup.srv import MovJ, DO, EnableRobot, DisableRobot,Sync, ClearError,JointMovJ
-from mg400_bringup.msg import ToolVectorActual
+from mg400_bringup.srv import MovJ, DO, EnableRobot, DisableRobot, SpeedJ, AccJ, Sync, ClearError,JointMovJ
+from mg400_bringup.msg import ToolVectorActual, RobotStatus
 from std_srvs.srv import Empty
 from std_srvs.srv import EmptyResponse
 from sklearn.linear_model import LinearRegression
@@ -19,50 +19,47 @@ import math
 class MOVE:
 	def __init__(self):
 		print("start MG400")
-                home = os.environ["HOME"]
-		self.xy_filepath = home + "/catkin_ws/src/MG400_basic/xy_calibration.txt"
-		self.z_filepath = home + "/catkin_ws/src/MG400_basic/z_calibration.txt"
+		home = os.environ["HOME"]
+		self.xy_filepath = home + "/catkin_ws/src/MG400_basic/files/xy_calibration.txt"
+		self.z_filepath = home + "/catkin_ws/src/MG400_basic/files/z_calibration.txt"
+
 		self.arm_move =rospy.ServiceProxy('/mg400_bringup/srv/MovJ',MovJ)
-		self.suction =rospy.ServiceProxy('/mg400_bringup/srv/DOExecute',DO)
-		self.sync =rospy.ServiceProxy('/mg400_bringup/srv/Sync',Sync)
+		self.set_SpeedJ =rospy.ServiceProxy('/mg400_bringup/srv/SpeedJ',SpeedJ)
+		self.set_AccJ =rospy.ServiceProxy('/mg400_bringup/srv/AccJ',AccJ)
 		self.arm_enable = rospy.ServiceProxy('/mg400_bringup/srv/EnableRobot',EnableRobot)
 		self.robot_coordinate = rospy.Subscriber("/mg400_bringup/msg/ToolVectorActual", ToolVectorActual, self.robotCoordinate_callback)
-                self.arm_disable = rospy.ServiceProxy('/mg400_bringup/srv/DisableRobot',DisableRobot)
+		self.arm_disable = rospy.ServiceProxy('/mg400_bringup/srv/DisableRobot',DisableRobot)
+		self.suction = rospy.ServiceProxy('/mg400_bringup/srv/DO', DO)
 		self.clear_error = rospy.ServiceProxy('/mg400_bringup/srv/ClearError',ClearError)
+		#self.robot_sync = rospy.ServiceProxy('/mg400_bringup/srv/Sync',Sync)
 		self.joint_move = rospy.ServiceProxy('/mg400_bringup/srv/JointMovJ',JointMovJ)
 		self.sub = rospy.Subscriber("/camera_pkg/coordinate", Coordinate, self.image_callback)
-		self.pub_move = rospy.Publisher("/autocalib/move", Int16, queue_size=10)
+		self.mg400_dsth = rospy.Publisher("/mg400/working", Bool, queue_size=1000)
 		self.work_start_srv_ = rospy.Service('/mg400_work/start', Empty, self.work_start_service)
-		self.twist_pub = rospy.Subscriber('/cmd_vel', Twist, self.twist_callback)
+		self.twist_pub = rospy.Subscriber('/MG400/cmd_vel', Twist, self.twist_callback)
+		self.robot_mode_sub = rospy.Subscriber('/mg400_bringup/msg/RobotStatus', RobotStatus, self.robotStatus_callback)
 		self.work_stop_srv_ = rospy.Service('/mg400_work/stop', Empty, self.work_stop_service)
-		self.xy_calib_start_srv = rospy.Service('/xy_calibration/start', Empty, self.xy_calib_start_service)
-		self.xy_calib_stop_srv = rospy.Service('/xy_calibration/stop', Empty, self.xy_calib_stop_service)
-		self.z_calib_start_srv = rospy.Service('/z_calibration/start', Empty, self.z_calib_start_service)
-		self.z_calib_stop_srv = rospy.Service('/z_calibration/stop', Empty, self.z_calib_stop_service)
+		self.calib_start_srv = rospy.Service('/calibration/start', Empty, self.calib_start_service)
+		self.calib_stop_srv = rospy.Service('/calibration/stop', Empty, self.calib_stop_service)
 		self.sub_jointState = rospy.Subscriber('/mg400_bringup/srv/ok', Twist, self.twist_callback)
 		self.camera_coordinate =np.array([[]])
-		self.xy_calib = False
-		self.z_calib = False
-		self.hz = 20
+		self.now = time.time()
+		self.end = time.time()
+		self.calib = False
+		self.robot_mode = 0
+		self.robot_mode_prev = 0
+		self.rate = rospy.Rate(20)
+		self.move_stopper= True
 		self.camera_z = np.array([[]])
-                self.RUN = 0
-                self.TIMEOUT = 0.5
-		self.count=0
-		self.place_y=-352
-		self.place_x=0
-                self.r_coordinate= 180
-		rate = rospy.Rate(self.hz)
+		self.RUN = 0
+		self.place_y=407
+		self.place_x=23
+		self.r_coordinate = 180
+		self.TIMEOUT = 0.5
 		self.last_clb_time_ = rospy.get_time()
 		self.x_r =0
 		self.y_r =0
 		self.z_r =0
-		self.pre_x_r=0
-		self.pre_y_r=0
-		self.pre_z_r=0
-		 
-		self.temp_x_r = 0
-		self.temp_y_r = 0
-		self.temp_z_r = 0
 		self.x_i =0
 		self.y_i =0
 		self.z_i =0
@@ -76,18 +73,23 @@ class MOVE:
 		self.x_r_coefficient = [0,0,0]
 		self.y_r_coefficient = [0,0,0]
 		self.readCalibFile()
+		self.set_SpeedJ(40)
+		self.set_AccJ(40)
+		while self.robot_mode == 0:
+			self.rate.sleep()
 		self.initialize()
+		self.arm_move(self.place_x ,self.place_y,60, self.r_coordinate)
+		self.sync_robot()
+		self.move_stopper = False
 
 	def initialize(self):
 		self.arm_disable()
-		time.sleep(0.5)
-                self.clear_error()
-		time.sleep(0.5)
-                self.arm_enable()
-                time.sleep(1)
-		#self.joint_move(0,0,0,0)
-                #time.sleep(0.5)
-                self.arm_move(300,0,120,self.r_coordinate)
+		self.clear_error()
+		self.arm_enable()
+		time.sleep(2)
+		while self.robot_mode !=5:
+			self.rate.sleep()
+		# self.joint_move(0,0,0,0)
 
 	def readCalibFile(self):
 		try:
@@ -112,13 +114,41 @@ class MOVE:
 					line = file.read()
 			line = line.split(",")
 			print(line)
-                        for i in range(len(line)):
+			for i in range(len(line)):
 				self.z_r_coefficient = float(line[0])
 				self.z_r_intercept = float(line[1])
 			print("done reading calib file ")
 		except Exception as e:
 			print(e)
-			
+
+	def sync_robot(self):
+		if self.robot_mode == 9:
+			self.initialize()
+		time.sleep(0.5)
+		while self.robot_mode !=5:
+			if self.robot_mode == 9:
+				self.initialize()
+				break
+			self.rate.sleep()
+
+	def robotStatus_callback(self, robot_status):
+		"""
+		    1:	"ROBOT_MODE_INIT",
+			2:	"ROBOT_MODE_BRAKE_OPEN",
+			3:	"",
+			4:	"ROBOT_MODE_DISABLED",
+			5:	"ROBOT_MODE_ENABLE",
+			6:	"ROBOT_MODE_BACKDRIVE",
+			7:	"ROBOT_MODE_RUNNING",
+			8:	"ROBOT_MODE_RECORDING",
+			9:	"ROBOT_MODE_ERROR",
+			10:	"ROBOT_MODE_PAUSE",
+			11:	"ROBOT_MODE_JOG"
+		"""
+		self.robot_mode = robot_status.robot_status
+
+
+
 	def getRobotCoordinate(self):
 		self.x_r = self.temp_x_r
 		self.y_r = self.temp_y_r
@@ -162,6 +192,10 @@ class MOVE:
 				pass
 		else:
 			if msg.t =="L":
+				self.move_stopper = True
+				if self.robot_mode == 9:
+					self.initialize()			
+				self.arm_move(300, 0, 30, self.r_coordinate)
 				msgs = [msg.x, msg.y, msg.z]
 				x_a, y_a =0,0
 				for i in range(len(self.x_r_coefficient)):
@@ -170,28 +204,16 @@ class MOVE:
 				x_a += self.x_r_intercept
 				y_a += self.y_r_intercept
 				z_a = msg.z*self.z_r_coefficient + self.z_r_intercept
-				z_move = 60
-                                # z_a = -14
-                                # x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
-				# y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
-				_r=self.r_coordinate
-				self.arm_move(x_a,y_a, z_move, _r)
-				self.arm_move(x_a,y_a,z_a, _r)
-				time.sleep(7)
-				self.suction(1,1)
-				time.sleep(0.5)
-				self.arm_move(x_a,y_a,z_move, _r)
-				self.arm_move(self.place_x,self.place_y,z_move, _r)
-				self.arm_move(self.place_x,self.place_y,-150, _r)
-				time.sleep(13)
-				self.suction(1,0)
-				time.sleep(0.5)
+				# z_a = -14
+				z_move=60
 				self.suction(2,1)
-				time.sleep(1)
+				self.arm_move(x_a,y_a,z_move , self.r_coordinate)
+				self.sync_robot()
+				self.arm_move(x_a,y_a,z_a, self.r_coordinate)
+				self.sync_robot()
 				self.suction(2,0)
-				time.sleep(1)
-				self.arm_move(-4,-250,z_move, _r)
-				time.sleep(3)
+				self.arm_move(x_a,y_a,z_move, self.r_coordinate)
+				self.sync_robot()
 
 			elif msg.t =="R":
 				self.xy_calib_start_service(Empty)
