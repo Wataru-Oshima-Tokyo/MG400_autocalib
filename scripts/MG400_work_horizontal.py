@@ -215,7 +215,7 @@ class MOVE:
                                 # z_a = -14
                                 # x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
 				# y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
-				self.arm_move(self.x_a-100,self.y_a, self.z_a, self.r_coordinate)
+				self.arm_move(self.x_a-200,self.y_a, self.z_a, self.r_coordinate)
 				self.sync_robot()
 				# self.arm_move(x_a,y_a,z_a, _r)
 				# self.sync_robot()
