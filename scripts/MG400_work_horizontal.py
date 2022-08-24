@@ -22,7 +22,7 @@ class MOVE:
                 home = os.environ["HOME"]
 		self.xy_filepath = home + "/catkin_ws/src/MG400_basic/files/xy_calibration_horizontal.txt"
 		self.z_filepath = home + "/catkin_ws/src/MG400_basic//files/z_calibration_horizontal.txt"
-		self.arm_move =rospy.ServiceProxy('/mg400_bringup/srv/MovJ',MovJ)
+		self.arm_move =rospy.ServiceProxy('/mg400_bringup/srv/MovL',MovJ)
 		self.set_SpeedJ =rospy.ServiceProxy('/mg400_bringup/srv/SpeedJ',SpeedJ)
 		self.set_AccJ =rospy.ServiceProxy('/mg400_bringup/srv/AccJ',AccJ)
 		self.arm_enable = rospy.ServiceProxy('/mg400_bringup/srv/EnableRobot',EnableRobot)
