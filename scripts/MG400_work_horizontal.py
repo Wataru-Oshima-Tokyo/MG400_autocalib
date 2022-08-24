@@ -231,7 +231,7 @@ class MOVE:
 				self.z_calib_start_service(Empty)
 			elif msg.t =="F":
 				self.getRobotCoordinate()
-				self.arm_move(self.x_a+15,self.y_r, self.z_r, self.r_coordinate)
+				self.arm_move(self.x_a,self.y_r, self.z_r, self.r_coordinate)
 				self.sync_robot()
 
 		self.last_clb_time_ = rospy.get_time()
