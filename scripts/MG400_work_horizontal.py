@@ -260,9 +260,12 @@ class MOVE:
 	def calibration(self):
 		self.camera_z = self.camera_z.reshape(-1,1)
 		print(self.camera_z)
-		self.x_coefficient = LinearRegression().fit(self.camera_coordinate, self.x_r_arr)
-		self.y_coefficient = LinearRegression().fit(self.camera_coordinate, self.y_r_arr)
-		self.z_coefficient = LinearRegression().fit(self.camera_z, self.z_r_arr)
+		# self.x_coefficient = LinearRegression().fit(self.camera_coordinate, self.x_r_arr)
+		# self.y_coefficient = LinearRegression().fit(self.camera_coordinate, self.y_r_arr)
+		# self.z_coefficient = LinearRegression().fit(self.camera_z, self.z_r_arr)
+		self.x_coefficient = LinearRegression().fit(self.camera_coordinate, self.y_r_arr)
+		self.y_coefficient = LinearRegression().fit(self.camera_coordinate, self.z_r_arr)
+		self.z_coefficient = LinearRegression().fit(self.camera_z, self.x_r_arr)
 		print(self.x_coefficient.coef_, self.x_coefficient.intercept_ , self.y_coefficient.coef_, self.y_coefficient.intercept_, self.z_coefficient.coef_, self.z_coefficient.intercept_)
 		if self.xy_calib:
 			with open(self.xy_filepath,"w+") as file:
