@@ -91,7 +91,9 @@ class MOVE:
 		self.move_stopper = False
 
 	def initialize(self):
-		# self.arm_disable()
+		time.sleep(2)
+		self.arm_disable()
+		time.sleep(2)
 		self.clear_error()
 		self.arm_enable()
                 time.sleep(2)
