@@ -5,7 +5,9 @@
     <arg name="depth_topic" default="/camera/aligned_depth_to_color/image_raw"/>
     <arg name="usbcam_topic" default="/usb_cam/color/image"/>
     <arg name="offset_fixed_x" default="161"/>
-    <arg name="offset_fixed_y" default="180"/>
+    <arg name="offset_fixed_y" default="203"/>
+    <arg name="calibration_path" default="$(find camera_pkg)/param/example.yml"/> 
+
     <param name="robot_description" textfile="$(find mg400_description)/urdf/mg400_description.urdf"/>
 
     <node name="mg400_bringup" pkg="mg400_bringup" type="mg400_bringup" output="screen">
@@ -27,6 +29,7 @@
     <param name="usbcam_topic" value="$(arg usbcam_topic)"/>
     <param name="offset_fixed_x" value="$(arg offset_fixed_x)"/>
     <param name="offset_fixed_y" value="$(arg offset_fixed_y)"/>
+    <param name="calibration_path" value="$(arg calibration_path)" />
     </node>
         
     <node name="MG400_horizontal_move"
