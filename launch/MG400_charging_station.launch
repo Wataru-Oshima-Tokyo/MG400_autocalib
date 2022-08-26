@@ -5,7 +5,7 @@
     <arg name="depth_topic" default="/camera/aligned_depth_to_color/image_raw"/>
     <arg name="usbcam_topic" default="/usb_cam/color/image"/>
     <arg name="offset_fixed_x" default="161"/>
-    <arg name="offset_fixed_y" default="203"/>
+    <arg name="offset_fixed_y" default="180"/>
     <param name="robot_description" textfile="$(find mg400_description)/urdf/mg400_description.urdf"/>
 
     <node name="mg400_bringup" pkg="mg400_bringup" type="mg400_bringup" output="screen">
