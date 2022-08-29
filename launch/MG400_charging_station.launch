@@ -3,9 +3,11 @@
     <arg name="robot_ip" doc="IP of the controller" default="192.168.1.6"/>
     <arg name="image_topic" default="/camera/color/image_raw"/>
     <arg name="depth_topic" default="/camera/aligned_depth_to_color/image_raw"/>
-    <arg name="usbcam_topic" default="/usb_cam/color/image"/>
-    <arg name="offset_fixed_x" default="161"/>
-    <arg name="offset_fixed_y" default="203"/>
+    <arg name="usbcam_topic" default="/usb_cam/image_raw"/>
+    <arg name="offset_fixed_x" default="-0.094"/>
+    <arg name="offset_fixed_y" default="-0.038"/>
+    <arg name="offset_fixed_z" default="0.37"/>
+    <arg name="Kp" default="30.0"/>
     <arg name="calibration_path" default="$(find camera_pkg)/param/example.yml"/> 
 
     <param name="robot_description" textfile="$(find mg400_description)/urdf/mg400_description.urdf"/>
@@ -16,9 +18,29 @@
         <param name="robot_ip_address" type="str" value="$(arg robot_ip)"/>
     </node>
 
+     <node name="MG400_horizontal_move"
+        pkg="MG400_basic"
+        type="MG400_work_horizontal.py"
+        output="screen"/>
+
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
     
-    <node name="usbcam" pkg="camera_pkg" type="pub_image_python.py" output="screen"></node>
+     <node pkg="uvc_camera" type="uvc_camera_node" name="uvc_camera" output="screen">
+    <param name="width" type="int" value="320" />
+    <param name="height" type="int" value="240" />
+    <param name="fps" type="int" value="30" />
+    <param name="frame" type="string" value="wide_stereo" />
+
+    <param name="auto_focus" type="bool" value="False" />
+    <param name="focus_absolute" type="int" value="0" />
+    <!-- other supported params: auto_exposure, exposure_absolute, brightness, power_line_frequency -->
+
+    <param name="device" type="string" value="/dev/video0" />
+    <param name="camera_info_url" type="string" value="file://$(find uvc_camera)/example.yaml" />
+    <remap from="/image_raw" to="/usb_cam/image_raw" />
+   </node>
+
+    
 
     <node name="outlet_detector"
         pkg="camera_pkg"
@@ -29,12 +51,11 @@
     <param name="usbcam_topic" value="$(arg usbcam_topic)"/>
     <param name="offset_fixed_x" value="$(arg offset_fixed_x)"/>
     <param name="offset_fixed_y" value="$(arg offset_fixed_y)"/>
+    <param name="offset_fixed_z" value="$(arg offset_fixed_z)"/>
     <param name="calibration_path" value="$(arg calibration_path)" />
+    <param name="Kp" value="$(arg Kp)" />
     </node>
         
-    <node name="MG400_horizontal_move"
-        pkg="MG400_basic"
-        type="MG400_work_horizontal.py"
-        output="screen"/>
+
                                     
 </launch>

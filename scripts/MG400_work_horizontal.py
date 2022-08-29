@@ -35,7 +35,7 @@ class MOVE:
 		self.sub = rospy.Subscriber("/outlet/coordinate", Coordinate, self.image_callback)
 		self.mg400_dsth = rospy.Publisher("/mg400/working", Bool, queue_size=100)
 		self.work_start_srv_ = rospy.Service('/mg400_work/start', Empty, self.work_start_service)
-                self.twist_pub = rospy.Subscriber('/MG400/cmd_vel', Twist, self.twist_callback)
+                self.twist_pub = rospy.Subscriber('/mg400/cmd_vel', Twist, self.twist_callback)
 		self.robot_mode_sub = rospy.Subscriber('/mg400_bringup/msg/RobotStatus', RobotStatus, self.robotStatus_callback)
 		self.work_stop_srv_ = rospy.Service('/mg400_work/stop', Empty, self.work_stop_service)
 		self.xy_calib_start_srv = rospy.Service('/xy_calibration/start', Empty, self.xy_calib_start_service)
@@ -54,8 +54,8 @@ class MOVE:
                 self.move_stopper= True
 		self.camera_z = np.array([[]])
                 self.RUN = 0
-		self.place_y=0
-		self.place_x=300
+		self.place_y=240
+		self.place_x=154
                 self.r_coordinate = 150
                 self.TIMEOUT = 0.5
 		self.ast_clb_time_ = rospy.get_time()
@@ -218,7 +218,7 @@ class MOVE:
                                 # z_a = -14
                                 # x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
 				# y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
-				self.arm_move(self.x_a-200,self.y_a, self.z_a, self.r_coordinate)
+				self.arm_move(self.x_a-180,self.y_a, self.z_a-30, self.r_coordinate)
 				self.sync_robot()
 				# self.arm_move(x_a,y_a,z_a, _r)
 				# self.sync_robot()
@@ -234,7 +234,8 @@ class MOVE:
 				self.z_calib_start_service(Empty)
 			elif msg.t =="F":
 				self.getRobotCoordinate()
-				self.arm_move(self.x_a,self.y_r, self.z_r, self.r_coordinate)
+				if self.x_r+180<500:
+					self.arm_move(self.x_r+180,self.y_r, self.z_r, self.r_coordinate)
 				self.sync_robot()
 
 		self.last_clb_time_ = rospy.get_time()
