@@ -75,6 +75,9 @@ class MOVE:
 		self.readCalibFile()
 		self.set_SpeedJ(40)
 		self.set_AccJ(40)
+		time.sleep(2)
+		self.arm_enable()
+		time.sleep(2)
 		while self.robot_mode == 0:
 			self.rate.sleep()
 		self.initialize()

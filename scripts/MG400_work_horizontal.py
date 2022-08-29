@@ -81,9 +81,12 @@ class MOVE:
 		self.readCalibFile()
 		self.set_SpeedJ(40)
 		self.set_AccJ(40)
+		time.sleep(2)
 		self.arm_enable()
+		time.sleep(2)
                 while self.robot_mode == 0:
                     self.rate.sleep()
+		
 		self.initialize()
 		time.sleep(2)
 		self.arm_move(self.place_x ,self.place_y,60, self.r_coordinate)
@@ -91,9 +94,7 @@ class MOVE:
 		self.move_stopper = False
 
 	def initialize(self):
-		time.sleep(2)
 		self.arm_disable()
-		time.sleep(2)
 		self.clear_error()
 		self.arm_enable()
                 time.sleep(2)
