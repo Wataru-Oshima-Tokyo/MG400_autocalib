@@ -5,9 +5,10 @@
     <arg name="depth_topic" default="/camera/aligned_depth_to_color/image_raw"/>
     <arg name="usbcam_topic" default="/usb_cam/image_raw"/>
     <arg name="offset_fixed_x" default="-0.094"/>
-    <arg name="offset_fixed_y" default="-0.038"/>
+    <arg name="offset_fixed_y" default="-0.040"/>
     <arg name="offset_fixed_z" default="0.37"/>
-    <arg name="Kp" default="30.0"/>
+    <arg name="angle_adjust" default="1.1"/>
+    <arg name="Kp" default="40.0"/>
     <arg name="calibration_path" default="$(find camera_pkg)/param/example.yml"/> 
 
     <param name="robot_description" textfile="$(find mg400_description)/urdf/mg400_description.urdf"/>
