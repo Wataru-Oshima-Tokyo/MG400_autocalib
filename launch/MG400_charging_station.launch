@@ -9,7 +9,7 @@
     <arg name="offset_fixed_z" default="0.37"/>
     <arg name="angle_adjust" default="1.1"/>
     <arg name="Kp" default="40.0"/>
-    <arg name="calibration_path" default="$(find camera_pkg)/param/example.yml"/> 
+    <arg name="calibration_path" default="$(find camera_pkg)/param/camera.yaml"/> 
 
     <param name="robot_description" textfile="$(find mg400_description)/urdf/mg400_description.urdf"/>
 
