@@ -262,6 +262,9 @@ class MOVE:
 				self.r_coordinate -= msg.r
 				self.arm_move(self.x_r, self.y_r, self.z_r, self.r_coordinate)
 			elif msg.t == "I":
+				time.sleep(2)
+				self.arm_enable()
+				time.sleep(2)
 				self.initValue()
 				self.arm_move(self.place_x ,self.place_y,60, self.r_coordinate)
 			elif msg.t =="R":
@@ -279,6 +282,7 @@ class MOVE:
 					self.arm_move(self.x_r+self.distance,self.y_r-_y, self.z_r, self.r_coordinate)
 					# self.arm_move(self.x_r+self.distance,self.y_r, self.z_r, self.r_coordinate)
 				self.sync_robot()
+				self.arm_disable()
 
 		self.last_clb_time_ = rospy.get_time()
 
