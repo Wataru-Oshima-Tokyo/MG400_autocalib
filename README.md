@@ -5,7 +5,7 @@
 ## please make sure that you have below ros packages besides this package
 
 ```
-camera_pkg
+camera_pkgs(camera_pkg, camera_pkg_msgs) (from my repo)
 uvc_camera
 realsense_ros
 mg400_ros (from my repo, not from Dobot since that is obsolete...)
@@ -27,6 +27,15 @@ roslaunch MG400_basic MG400_charging_station.launch
 ### 4. once MG400 moves and the aruco marker is in the range of the camera frame, then start the rosservice
 ```
 rosservice call /arucodetect/start
+```
+### For test cases, you can call the below service so that you do not have to restart the program. After you call it, just call the above service
+```
+rosservice call /arucodetect/reset
+```
+
+### FYI, you can see the angle and distance right after you call the start service such as below
+
+
 ```
 
 
