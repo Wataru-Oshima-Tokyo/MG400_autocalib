@@ -5,9 +5,8 @@
     <arg name="depth_topic" default="/camera/aligned_depth_to_color/image_raw"/>
     <arg name="usbcam_topic" default="/usb_cam/image_raw"/>
     <arg name="offset_fixed_x" default="0.009"/>
-    <arg name="offset_fixed_y" default="0.0345
-    "/>
-    <arg name="offset_fixed_z" default="0.201"/>
+    <arg name="offset_fixed_y" default="0.0345"/>
+    <arg name="offset_fixed_z" default="0.195"/>
     <arg name="angle_adjust" default="0.8"/>
     <arg name="Kp" default="200.0"/>
     <arg name="calibration_path" default="$(find camera_pkg)/param"/> 

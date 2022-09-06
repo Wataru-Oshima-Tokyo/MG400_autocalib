@@ -101,6 +101,11 @@ class MOVE:
 		self.sync_robot()
 		self.move_stopper = False
 
+	def initValue(self):
+		self.distance = 180
+		self.r_coordinate = 150
+		self.angle = 0
+
 	def initialize(self):
 		self.arm_disable()
 		self.clear_error()
@@ -227,7 +232,7 @@ class MOVE:
 				if self.robot_mode == 9:
 					self.initialize()
 				msgs = [msg.x, msg.y, msg.z]  
-				x_a, y_a =0,0
+				self.x_a, self.y_a =0,0
 				for i in range(len(self.x_r_coefficient)):
 					self.x_a += msgs[i]*self.x_r_coefficient[i]
 					self.y_a += msgs[i]*self.y_r_coefficient[i]
@@ -243,6 +248,7 @@ class MOVE:
 				# self.arm_move(x_a,y_a,z_a, _r)
 				# self.sync_robot()
 				self.mg400_dsth.publish(False)
+
 			elif msg.t == "D":
 				# added by the angle
 				self.getRobotCoordinate()
@@ -250,14 +256,14 @@ class MOVE:
 				self.r_coordinate -= self.angle
 				_y = self.distance * math.sin(math.radians(self.angle/0.7))
 				self.arm_move(self.x_r, self.y_r + _y, self.z_r, self.r_coordinate)
-				# self.arm_move(x_a-50,y_a,z_a, _r)
-				# self.sync_robot()
-				# self.arm_move(x_a-50,y_a,120, _r)
 			elif msg.t == "A":
 				self.getRobotCoordinate()
 				self.angle -= msg.r
 				self.r_coordinate -= msg.r
 				self.arm_move(self.x_r, self.y_r, self.z_r, self.r_coordinate)
+			elif msg.t == "I":
+				self.initValue()
+				self.arm_move(self.place_x ,self.place_y,60, self.r_coordinate)
 			elif msg.t =="R":
 				self.xy_calib_start_service(Empty)
 			elif msg.t =="M":
