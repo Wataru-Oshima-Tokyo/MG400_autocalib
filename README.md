@@ -35,6 +35,6 @@ rosservice call /arucodetect/reset
 
 ### FYI, you can see the angle and distance right after you call the start service such as below
 
-![alt text]([http://url/to/img.png](https://github.com/Wataru-Oshima-Tokyo/MG400_basic/blob/main/74464.jpg))
+![alt text](https://github.com/Wataru-Oshima-Tokyo/MG400_basic/74464.jpg)
 
 
