@@ -9,7 +9,7 @@ from camera_pkg_msgs.msg import Coordinate
 import rospy
 import cv_bridge
 import numpy as np
-from mg400_bringup.srv import MovJ, DO, EnableRobot, DisableRobot, SpeedJ, AccJ, Sync, ClearError,JointMovJ
+from mg400_bringup.srv import MovL, DO, EnableRobot, DisableRobot, SpeedJ, AccJ, Sync, ClearError,JointMovJ
 from mg400_bringup.msg import ToolVectorActual, RobotStatus
 from std_srvs.srv import Empty
 from std_srvs.srv import EmptyResponse
@@ -23,7 +23,7 @@ class MOVE:
 		self.xy_filepath = home + "/catkin_ws/src/MG400_basic/files/xy_calibration_horizontal.txt"
 		self.z_filepath = home + "/catkin_ws/src/MG400_basic//files/z_calibration_horizontal.txt"
 		self.r_filepath = home + "/catkin_ws/src/MG400_basic//files/r_calibration_horizontal.txt"
-		self.arm_move =rospy.ServiceProxy('/mg400_bringup/srv/MovL',MovJ)
+		self.arm_move =rospy.ServiceProxy('/mg400_bringup/srv/MovL',MovL)
 		self.set_SpeedJ =rospy.ServiceProxy('/mg400_bringup/srv/SpeedJ',SpeedJ)
 		self.set_AccJ =rospy.ServiceProxy('/mg400_bringup/srv/AccJ',AccJ)
 		self.arm_enable = rospy.ServiceProxy('/mg400_bringup/srv/EnableRobot',EnableRobot)
@@ -88,7 +88,7 @@ class MOVE:
 		self.readCalibFile()
 		self.set_SpeedJ(40)
 		self.set_AccJ(40)
-		self.distance = 200
+		self.distance = 180
 		time.sleep(2)
 		self.arm_enable()
 		time.sleep(2)
@@ -191,7 +191,8 @@ class MOVE:
 		x = self.temp_x_r + msg.linear.x
 		y = self.temp_y_r + msg.linear.y
 		z = self.temp_z_r + msg.linear.z
-		r = self.temp_r_r + msg.angular.z
+		# r = self.temp_r_r + msg.angular.z
+		r = self.r_coordinate
 		if not self.Move:
 			self.Move =True
 			self.arm_move(x, y, z, r)
@@ -245,14 +246,18 @@ class MOVE:
 			elif msg.t == "D":
 				# added by the angle
 				self.getRobotCoordinate()
-				self.angle = msg.r*1.1
+				self.angle = msg.r * 0.7
 				self.r_coordinate -= self.angle
-				_y = self.distance * math.sin(math.radians(self.angle))
+				_y = self.distance * math.sin(math.radians(self.angle/0.7))
 				self.arm_move(self.x_r, self.y_r + _y, self.z_r, self.r_coordinate)
 				# self.arm_move(x_a-50,y_a,z_a, _r)
 				# self.sync_robot()
 				# self.arm_move(x_a-50,y_a,120, _r)
-
+			elif msg.t == "A":
+				self.getRobotCoordinate()
+				self.angle -= msg.r
+				self.r_coordinate -= msg.r
+				self.arm_move(self.x_r, self.y_r, self.z_r, self.r_coordinate)
 			elif msg.t =="R":
 				self.xy_calib_start_service(Empty)
 			elif msg.t =="M":
@@ -266,6 +271,7 @@ class MOVE:
 					_y = d* math.sin(math.radians(self.angle)) 
 					# self.arm_move(self.x_r+cosx,self.y_r+siny, self.z_r, self.r_coordinate)
 					self.arm_move(self.x_r+self.distance,self.y_r-_y, self.z_r, self.r_coordinate)
+					# self.arm_move(self.x_r+self.distance,self.y_r, self.z_r, self.r_coordinate)
 				self.sync_robot()
 
 		self.last_clb_time_ = rospy.get_time()
