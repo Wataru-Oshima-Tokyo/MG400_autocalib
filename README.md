@@ -24,7 +24,7 @@ roslaunch realsense2_camera rs_camera.launch align_depth:=true
 roslaunch MG400_basic MG400_charging_station.launch
 ```
 
-### 4. once MG400 moves and the aruco marker is in the range of camera frame, then start the rosservice
+### 4. once MG400 moves and the aruco marker is in the range of the camera frame, then start the rosservice
 ```
 rosservice call /arucodetect/start
 ```
