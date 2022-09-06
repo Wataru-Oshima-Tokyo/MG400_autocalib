@@ -10,7 +10,7 @@ uvc_camera
 realsense_ros
 mg400_ros (from my repo, not from Dobot since that is obsolete...)
 ```
-### 1. execut connect_to_MG400.sh so that the device starts to connect to MG400 in the condition where the device is still connected to the Internet
+### 1. execute connect_to_MG400.sh in bash_files so that the device starts to connect to MG400 in the condition where the device is still connected to the Internet
 ```
 sudo ./connect_to_MG400.sh
 ```
