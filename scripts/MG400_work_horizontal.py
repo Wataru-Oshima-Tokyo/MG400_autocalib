@@ -24,6 +24,7 @@ class MOVE:
 		self.z_filepath = home + "/catkin_ws/src/MG400_basic//files/z_calibration_horizontal.txt"
 		self.r_filepath = home + "/catkin_ws/src/MG400_basic//files/r_calibration_horizontal.txt"
 		self.arm_move =rospy.ServiceProxy('/mg400_bringup/srv/MovL',MovL)
+		self.arm_reset =rospy.ServiceProxy('/arucodetect/reset',Empty)
 		self.set_SpeedJ =rospy.ServiceProxy('/mg400_bringup/srv/SpeedJ',SpeedJ)
 		self.set_AccJ =rospy.ServiceProxy('/mg400_bringup/srv/AccJ',AccJ)
 		self.arm_enable = rospy.ServiceProxy('/mg400_bringup/srv/EnableRobot',EnableRobot)
@@ -275,12 +276,15 @@ class MOVE:
 				self.z_calib_start_service(Empty)
 			elif msg.t =="F":
 				self.getRobotCoordinate()
-				if self.x_r+self.distance<500:
+				if self.x_r+self.distance<450:
 					#180 is the dinstance from the camera to the object
 					if abs(self.angle/self.coeficient) > 20:
 						# self.distance = 20
 						d = self.distance/math.cos(math.radians(self.angle*1.08))
-						self.distance *=0.95
+						if abs(self.angle/self.coeficient) > 40:
+							self.distance *=0.90
+						else:
+							self.distance *=0.95
 					else: 
 						d = self.distance/math.cos(math.radians(self.angle))
 					_x = self.distance* math.cos(math.radians(self.angle))
@@ -291,6 +295,10 @@ class MOVE:
 					print("angle", self.angle/self.coeficient)
 					self.arm_move(self.x_r+self.distance,self.y_r-_y, self.z_r, self.r_coordinate)
 					# self.arm_move(self.x_r+self.distance, self.y_r-_y, self.z_r, self.r_coordinate)
+				else:
+					print("out of range")
+					self.arm_reset()
+
 				self.sync_robot()
 				self.arm_disable()
 
