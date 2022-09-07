@@ -239,6 +239,7 @@ class MOVE:
 				self.x_a += self.x_r_intercept
 				self.y_a += self.y_r_intercept
 				self.z_a = msg.z*self.z_r_coefficient + self.z_r_intercept
+				self._d = msg.z
 				self.arm_move(self.x_a*0.5,self.y_a, self.z_a-20, self.r_coordinate-msg.r)
                                 # z_a = -14
                                 # x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
@@ -258,8 +259,8 @@ class MOVE:
 				self.arm_move(self.x_r, self.y_r + _y, self.z_r, self.r_coordinate)
 			elif msg.t == "A":
 				self.getRobotCoordinate()
-				self.angle -= msg.r
-				self.r_coordinate -= msg.r
+				self.angle += msg.r *0.7
+				self.r_coordinate -= msg.r *0.7
 				self.arm_move(self.x_r, self.y_r, self.z_r, self.r_coordinate)
 			elif msg.t == "I":
 				time.sleep(2)
@@ -275,12 +276,20 @@ class MOVE:
 				self.getRobotCoordinate()
 				if self.x_r+self.distance<500:
 					#180 is the dinstance from the camera to the object
-					d = self.distance/ math.cos(math.radians(self.angle))
-					# _x = 180* math.cos(math.radians(self.angle))
+					if self.angle/0.7 > 20:
+						# self.distance = 20
+						d = self.distance/math.cos(math.radians(self.angle*1.08))
+						self.distance *=0.95
+					else: 
+						d = self.distance/math.cos(math.radians(self.angle))
+					_x = self.distance* math.cos(math.radians(self.angle))
 					_y = d* math.sin(math.radians(self.angle)) 
-					# self.arm_move(self.x_r+cosx,self.y_r+siny, self.z_r, self.r_coordinate)
+					# _y = self.distance* math.sin(math.radians(self.angle)) 
+					print("y_adjustment",_y)
+					print("distance", self._d)
+					print("angle", self.angle/0.7)
 					self.arm_move(self.x_r+self.distance,self.y_r-_y, self.z_r, self.r_coordinate)
-					# self.arm_move(self.x_r+self.distance,self.y_r, self.z_r, self.r_coordinate)
+					# self.arm_move(self.x_r+self.distance, self.y_r-_y, self.z_r, self.r_coordinate)
 				self.sync_robot()
 				self.arm_disable()
 
