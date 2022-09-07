@@ -276,25 +276,25 @@ class MOVE:
 				self.z_calib_start_service(Empty)
 			elif msg.t =="F":
 				self.getRobotCoordinate()
-				if self.x_r+self.distance<450:
 					#180 is the dinstance from the camera to the object
-					if abs(self.angle/self.coeficient) > 20:
-						# self.distance = 20
-						d = self.distance/math.cos(math.radians(self.angle*1.08))
-						if abs(self.angle/self.coeficient) > 40:
-							self.distance *=0.90
-						else:
-							self.distance *=0.95
-					else: 
-						d = self.distance/math.cos(math.radians(self.angle))
-					_x = self.distance* math.cos(math.radians(self.angle))
-					_y = d* math.sin(math.radians(self.angle)) 
-					# _y = self.distance* math.sin(math.radians(self.angle)) 
-					print("y_adjustment",_y)
-					print("distance", self._d)
-					print("angle", self.angle/self.coeficient)
+				if abs(self.angle/self.coeficient) > 20:
+					dis_coef = -0.008*abs(self.angle/self.coeficient) + 1.11
+					angle_coef = 0.0372*abs(self.angle/self.coeficient) + 0.326
+					print("angle_coef", angle_coef)
+					d = self.distance/math.cos(math.radians(self.angle*angle_coef))
+					self.distance *= dis_coef
+
+				else: 
+					d = self.distance/math.cos(math.radians(self.angle))
+				_x = self.distance* math.cos(math.radians(self.angle))
+				_y = d* math.sin(math.radians(self.angle)) 
+				# _y = self.distance* math.sin(math.radians(self.angle)) 
+				print("y_adjustment",_y)
+				print("distance", self._d)
+				print("angle", self.angle/self.coeficient)
+				if self.x_r+self.distance <450:
 					self.arm_move(self.x_r+self.distance,self.y_r-_y, self.z_r, self.r_coordinate)
-					# self.arm_move(self.x_r+self.distance, self.y_r-_y, self.z_r, self.r_coordinate)
+				# self.arm_move(self.x_r+self.distance, self.y_r-_y, self.z_r, self.r_coordinate)
 				else:
 					print("out of range")
 					self.arm_reset()
