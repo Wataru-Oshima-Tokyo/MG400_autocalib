@@ -258,7 +258,8 @@ class MOVE:
 				self.angle = msg.r * self.coeficient
 				self.r_coordinate -= self.angle
 				_y = self.distance * math.sin(math.radians(self.angle/self.coeficient))
-				self.arm_move(self.x_r, self.y_r + _y, self.z_r, self.r_coordinate)
+				_x = self.distance -  self.distance * math.cos(math.radians(self.angle/self.coeficient))
+				self.arm_move(self.x_r+_x, self.y_r + _y, self.z_r, self.r_coordinate)
 			elif msg.t == "A":
 				self.getRobotCoordinate()
 				self.angle += msg.r *self.coeficient
@@ -283,11 +284,14 @@ class MOVE:
 					print("angle_coef", angle_coef)
 					d = self.distance/math.cos(math.radians(self.angle*angle_coef))
 					self.distance *= dis_coef
-
 				else: 
 					d = self.distance/math.cos(math.radians(self.angle))
 				_x = self.distance* math.cos(math.radians(self.angle))
 				_y = d* math.sin(math.radians(self.angle)) 
+				if self.angle/self.coeficient <-20:
+					_y_coef = 0.02*(self.angle/self.coeficient) +1.2
+					_y *=_y_coef
+					self.distance *= 1.05
 				# _y = self.distance* math.sin(math.radians(self.angle)) 
 				print("y_adjustment",_y)
 				print("distance", self._d)
