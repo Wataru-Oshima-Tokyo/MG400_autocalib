@@ -259,7 +259,7 @@ class MOVE:
 				self.angle = msg.r * self.coeficient
 				self.r_coordinate -= self.angle
 				_y = self.distance * math.sin(math.radians(self.angle/self.coeficient))
-				_x = self.distance -  self.distance * math.cos(math.radians(self.angle/self.coeficient))
+				_x = self.distance -  self.distance * math.cos(math.radians(self.angle/self.coeficient)) -10
 				self.arm_move(self.x_r+_x, self.y_r + _y, self.z_r, self.r_coordinate)
 			elif msg.t == "A":
 				self.getRobotCoordinate()
@@ -273,12 +273,11 @@ class MOVE:
 				self.initValue()
 				self.getRobotCoordinate()
 				#rotate the endeffector to remove itself from the outlet
-				_ex = 40
+				_ex = 80
 				if self.r_r >150:
 					_ex *=-1
 				
-				
-				self.arm_move(self.x_r- abs(2(_ex), self.y_r-2*_ex, self.z_r, self.r_r+_ex)
+				self.arm_move(self.x_r- 10, self.y_r-_ex, self.z_r, self.r_r+_ex)
 				self.sync_robot()
 				self.arm_move(self.place_x ,self.place_y,60, self.r_coordinate)
 				self.sync_robot()
@@ -300,8 +299,8 @@ class MOVE:
 					d = self.distance/math.cos(math.radians(self.angle))
 				_x = self.distance* math.cos(math.radians(self.angle))
 				_y = d* math.sin(math.radians(self.angle)) 
-				if self.angle/self.coeficient <-20:
-					self.distance *= 1.03
+				if self.angle/self.coeficient <-30:
+					self.distance *= 1.04
 					# _y_coef = 0.02*(self.angle/self.coeficient) +1.2
 					# _y *=_y_coef
 					
