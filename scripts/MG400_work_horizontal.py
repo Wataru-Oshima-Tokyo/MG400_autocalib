@@ -9,7 +9,7 @@ from camera_pkg_msgs.msg import Coordinate
 import rospy
 import cv_bridge
 import numpy as np
-from mg400_bringup.srv import MovL, DO, EnableRobot, DisableRobot, SpeedJ, AccJ, Sync, ClearError,JointMovJ
+from mg400_bringup.srv import MovL, DO, EnableRobot, DisableRobot, SpeedJ, AccJ, Sync, ClearError,JointMovJ,SetCollisionLevel
 from mg400_bringup.msg import ToolVectorActual, RobotStatus
 from std_srvs.srv import Empty
 from std_srvs.srv import EmptyResponse
@@ -24,6 +24,7 @@ class MOVE:
 		self.z_filepath = home + "/catkin_ws/src/MG400_basic//files/z_calibration_horizontal.txt"
 		self.r_filepath = home + "/catkin_ws/src/MG400_basic//files/r_calibration_horizontal.txt"
 		self.arm_move =rospy.ServiceProxy('/mg400_bringup/srv/MovL',MovL)
+		self.collision_level =rospy.ServiceProxy('/mg400_bringup/srv/SetCollisionLevel',SetCollisionLevel)
 		self.arm_reset =rospy.ServiceProxy('/arucodetect/reset',Empty)
 		self.set_SpeedJ =rospy.ServiceProxy('/mg400_bringup/srv/SpeedJ',SpeedJ)
 		self.set_AccJ =rospy.ServiceProxy('/mg400_bringup/srv/AccJ',AccJ)
@@ -270,7 +271,17 @@ class MOVE:
 				self.arm_enable()
 				time.sleep(2)
 				self.initValue()
+				self.getRobotCoordinate()
+				#rotate the endeffector to remove itself from the outlet
+				_ex = 40
+				if self.r_r >150:
+					_ex *=-1
+				
+				
+				self.arm_move(self.x_r- abs(2(_ex), self.y_r-2*_ex, self.z_r, self.r_r+_ex)
+				self.sync_robot()
 				self.arm_move(self.place_x ,self.place_y,60, self.r_coordinate)
+				self.sync_robot()
 			elif msg.t =="R":
 				self.xy_calib_start_service(Empty)
 			elif msg.t =="M":
@@ -279,19 +290,21 @@ class MOVE:
 				self.getRobotCoordinate()
 					#180 is the dinstance from the camera to the object
 				if abs(self.angle/self.coeficient) > 20:
-					dis_coef = -0.008*abs(self.angle/self.coeficient) + 1.11
-					angle_coef = 0.0372*abs(self.angle/self.coeficient) + 0.326
+					dis_coef = -0.00625*abs(self.angle/self.coeficient) + 1.075
+					angle_coef = -0.04041*abs(self.angle/self.coeficient) + 1.8783
 					print("angle_coef", angle_coef)
 					d = self.distance/math.cos(math.radians(self.angle*angle_coef))
+					# d = self.distance/math.cos(math.radians(self.angle))
 					self.distance *= dis_coef
 				else: 
 					d = self.distance/math.cos(math.radians(self.angle))
 				_x = self.distance* math.cos(math.radians(self.angle))
 				_y = d* math.sin(math.radians(self.angle)) 
 				if self.angle/self.coeficient <-20:
-					_y_coef = 0.02*(self.angle/self.coeficient) +1.2
-					_y *=_y_coef
-					self.distance *= 1.05
+					self.distance *= 1.03
+					# _y_coef = 0.02*(self.angle/self.coeficient) +1.2
+					# _y *=_y_coef
+					
 				# _y = self.distance* math.sin(math.radians(self.angle)) 
 				print("y_adjustment",_y)
 				print("distance", self._d)
