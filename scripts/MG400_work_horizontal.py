@@ -273,11 +273,11 @@ class MOVE:
 				self.initValue()
 				self.getRobotCoordinate()
 				#rotate the endeffector to remove itself from the outlet
-				_ex = 80
+				_ex = 90
 				if self.r_r >150:
 					_ex *=-1
 				
-				self.arm_move(self.x_r- 10, self.y_r-_ex, self.z_r, self.r_r+_ex)
+				self.arm_move(self.x_r- 20, self.y_r-_ex, self.z_r, self.r_r+_ex)
 				self.sync_robot()
 				self.arm_move(self.place_x ,self.place_y,60, self.r_coordinate)
 				self.sync_robot()
