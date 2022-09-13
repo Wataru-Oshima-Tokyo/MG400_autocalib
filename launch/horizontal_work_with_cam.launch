@@ -3,6 +3,7 @@
     <arg name="robot_ip" doc="IP of the controller" default="192.168.1.6"/>
     <arg name="image_topic" default="/camera/color/image_raw"/>
     <arg name="depth_topic" default="/camera/aligned_depth_to_color/image_raw"/>
+    <arg name="publish_topic" default="/outlet/coordinate"/>
     <param name="robot_description" textfile="$(find mg400_description)/urdf/mg400_description.urdf"/>
 
     <node name="mg400_bringup" pkg="mg400_bringup" type="mg400_bringup" output="screen">
@@ -25,11 +26,12 @@
         output="screen">
     <param name="image_topic" value="$(arg image_topic)"/>
     <param name="depth_topic" value="$(arg depth_topic)"/> 
+    <param name="publish_topic" value="$(arg publish_topic)"/>
     </node>
         
     <node name="MG400_calibration"
         pkg="MG400_basic"
-        type="MG400_work_horizontal.py"
+        type="MG400_work_horizontal.py" 
         output="screen"/>
                                     
 </launch>

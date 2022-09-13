@@ -46,7 +46,9 @@ class MOVE:
 		self.z_calib_start_srv = rospy.Service('/z_calibration/start', Empty, self.z_calib_start_service)
 		self.z_calib_stop_srv = rospy.Service('/z_calibration/stop', Empty, self.z_calib_stop_service)
 		self.sub_jointState = rospy.Subscriber('/mg400_bringup/srv/ok', Twist, self.twist_callback)
-		self.camera_coordinate =np.array([[]])
+		self.camera_coordinate_x =np.array([[]])
+		self.camera_coordinate_y =np.array([[]])
+		self.camera_coordinate_z =np.array([[]])
 		self.now = time.time()
 		self.end = time.time()
 		self.xy_calib = False
@@ -134,7 +136,10 @@ class MOVE:
 				elif i ==1:
 					for j in range(len(word)-1):
 						self.y_r_coefficient[j] = float(word[j])
+						print("coef", j,self.y_r_coefficient[j])
+					print("")
 					self.y_r_intercept = float(word[-1])
+					print(self.y_r_intercept)
 				else:
 					pass
 			with open(self.z_filepath,"r") as file:
@@ -144,10 +149,6 @@ class MOVE:
                         for i in range(len(line)):
 				self.z_r_coefficient = float(line[0])
 				self.z_r_intercept = float(line[1])
-			with open(self.z_filepath,"r") as file:
-					line = file.read()
-			line = line.split(",")
-			print(line)
 			# for i in range(len(line)):
 			# 	self.r_r_coefficient = float(line[0])
 			# 	self.r_r_intercept = float(line[1])
@@ -209,6 +210,17 @@ class MOVE:
 	def image_callback(self, msg):
 		#initial postion for MG400 in image coordinate is 566(x),145(y) and robot coordination is (300, 0)
 		#from left to center, (332,145) and robot (300, 113)
+		print("the message is ", msg.t)
+		"""
+		robot_x -> camera_z
+		robot_y -> camera_x
+		robot_z -> camera_y 
+		"""
+		temp = msg.y
+		msg.y = msg.x
+		msg.x = msg.z
+		msg.z = temp
+		print("y:", msg.y)
 		if self.xy_calib or self.z_calib:
 			if msg.t =="L":
                                 #self.arm_enable()
@@ -227,6 +239,7 @@ class MOVE:
 				#self.arm_move(self.pre_x_r, self.pre_y_r, self.pre_z_r+20, 0, 0, 0)
                                 #self.arm_disable()
 			elif msg.t =="M":
+				print("here")
 # 				self.cancelAppend()
 				self.calibration()
 				pass
@@ -236,14 +249,15 @@ class MOVE:
 					self.initialize()
 				msgs = [msg.x, msg.y, msg.z]  
 				self.x_a, self.y_a =0,0
-				for i in range(len(self.x_r_coefficient)):
-					self.x_a += msgs[i]*self.x_r_coefficient[i]
-					self.y_a += msgs[i]*self.y_r_coefficient[i]
-				self.x_a += self.x_r_intercept
-				self.y_a += self.y_r_intercept
+				# for i in range(len(self.x_r_coefficient)):
+				# 	self.x_a += msgs[0]*self.x_r_coefficient[i]
+				# for i in range(len(self.y_r_coefficient)):
+				# 	self.y_a += msgs[1]*self.y_r_coefficient[i]
+				self.x_a = msg.x*self.x_r_coefficient[0] + self.x_r_intercept
+				self.y_a = msg.y*self.y_r_coefficient[0] + self.y_r_intercept
 				self.z_a = msg.z*self.z_r_coefficient + self.z_r_intercept
 				self._d = msg.z
-				self.arm_move(self.x_a*0.5,self.y_a, self.z_a-20, self.r_coordinate-msg.r)
+				self.arm_move(self.x_a*0.5,self.y_a, self.z_a-60, self.r_coordinate-msg.r)
                                 # z_a = -14
                                 # x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
 				# y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
@@ -282,9 +296,11 @@ class MOVE:
 				self.arm_move(self.place_x ,self.place_y,60, self.r_coordinate)
 				self.sync_robot()
 			elif msg.t =="R":
-				self.xy_calib_start_service(Empty)
+				# self.xy_calib_start_service(Empty)
+				self.xy_calib=True
 			elif msg.t =="M":
-				self.z_calib_start_service(Empty)
+				# self.z_calib_start_service(Empty)
+				self.z_calib=True
 			elif msg.t =="F":
 				self.getRobotCoordinate()
 					#180 is the dinstance from the camera to the object
@@ -326,15 +342,22 @@ class MOVE:
 
 	def addCoordinate(self):
 		if self.x_r != 0  and self.y_r !=0 and self.z_r !=0:
-			pose =np.array([[self.x_i, self.y_i, self.z_i]])
-			#pose =np.array([[self.x_i, self.y_i]])
-			z_coordiante = np.array([self.z_i])
-			if self.camera_coordinate.size ==0:
-				self.camera_coordinate = pose
-				self.camera_z = z_coordiante
+			# pose =np.array([[self.x_i, self.y_i, self.z_i]])
+			pose_x = np.array([[self.x_i]])
+			pose_y = np.array([[self.y_i]])
+			pose_z = np.array([[self.z_i]])
+			# z_coordiante = np.array([self.y_i])
+			if self.camera_coordinate_x.size == 0:
+				self.camera_coordinate_x =pose_x
+				self.camera_coordinate_y =pose_y
+				self.camera_coordinate_z =pose_z
+				# self.camera_coordinate = pose
+				# self.camera_z = z_coordiante
 			else:
-				self.camera_coordinate = np.append(self.camera_coordinate, pose, axis=0)
-				self.camera_z = np.append(self.camera_z, z_coordiante)
+				self.camera_coordinate_x = np.append(self.camera_coordinate_x, pose_x, axis=0)
+				self.camera_coordinate_y = np.append(self.camera_coordinate_y, pose_y, axis=0)
+				self.camera_coordinate_z = np.append(self.camera_coordinate_z, pose_z, axis=0)
+				# self.camera_z = np.append(self.camera_z, z_coordiante)
 			self.x_r_arr.append(self.x_r)
 			self.y_r_arr.append(self.y_r)
 			self.z_r_arr.append(self.z_r)
@@ -347,9 +370,10 @@ class MOVE:
 		# self.x_coefficient = LinearRegression().fit(self.camera_coordinate, self.x_r_arr)
 		# self.y_coefficient = LinearRegression().fit(self.camera_coordinate, self.y_r_arr)
 		# self.z_coefficient = LinearRegression().fit(self.camera_z, self.z_r_arr)
-		self.x_coefficient = LinearRegression().fit(self.camera_coordinate, self.y_r_arr)
-		self.y_coefficient = LinearRegression().fit(self.camera_coordinate, self.z_r_arr)
-		self.z_coefficient = LinearRegression().fit(self.camera_z, self.x_r_arr)
+		self.x_coefficient = LinearRegression().fit(self.camera_coordinate_x, self.x_r_arr)
+		self.y_coefficient = LinearRegression().fit(self.camera_coordinate_y, self.y_r_arr)
+		self.z_coefficient = LinearRegression().fit(self.camera_coordinate_z, self.z_r_arr)
+		# self.z_coefficient = LinearRegression().fit(self.camera_z, self.z_r_arr)
 		print(self.x_coefficient.coef_, self.x_coefficient.intercept_ , self.y_coefficient.coef_, self.y_coefficient.intercept_, self.z_coefficient.coef_, self.z_coefficient.intercept_)
 		if self.xy_calib:
 			with open(self.xy_filepath,"w+") as file:
@@ -359,6 +383,7 @@ class MOVE:
 				for i in range(len(self.y_coefficient.coef_)):
 					file.write(str(self.y_coefficient.coef_[i])+',')
 				file.write(str(self.y_coefficient.intercept_)+'\n')
+			with open(self.z_filepath,"w+") as file:
 				file.write(str(self.z_coefficient.coef_[0])+',')
 				file.write(str(self.z_coefficient.intercept_))
 			self.xy_calib_stop_service(Empty)
@@ -369,7 +394,9 @@ class MOVE:
 			self.z_calib_stop_service(Empty)	
 		self.readCalibFile()
 
-		self.camera_coordinate =np.array([[]])
+		self.camera_coordinate_x =np.array([[]])
+		self.camera_coordinate_y =np.array([[]])
+		self.camera_coordinate_z =np.array([[]])
 		self.camera_z = np.array([[]])
 		self.x_r_arr =[]
 		self.y_r_arr =[]
@@ -405,7 +432,9 @@ class MOVE:
 	def xy_calib_stop_service(self,req):
 		print("stop xy_calibration")
 		self.xy_calib = False
-		self.camera_coordinate =np.array([[]])
+		self.camera_coordinate_x =np.array([[]])
+		self.camera_coordinate_y =np.array([[]])
+		self.camera_coordinate_z =np.array([[]])
 		self.x_r_arr =[]
 		self.y_r_arr =[]
 		return EmptyResponse()
@@ -418,7 +447,9 @@ class MOVE:
 	def z_calib_stop_service(self,req):
 		print("stop z_calibration")
 		self.z_calib = False
-		self.camera_z = np.array([[]])
+		self.camera_coordinate_x =np.array([[]])
+		self.camera_coordinate_y =np.array([[]])
+		self.camera_coordinate_z =np.array([[]])
 		self.z_r_arr =[]
 		return EmptyResponse()
 
