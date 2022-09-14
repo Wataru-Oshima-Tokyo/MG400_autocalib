@@ -4,6 +4,7 @@
     <arg name="image_topic" default="/camera/color/image_raw"/>
     <arg name="depth_topic" default="/camera/aligned_depth_to_color/image_raw"/>
     <arg name="usbcam_topic" default="/usb_cam/image_raw"/>
+    <!-- <arg name="offset_fixed_x" default="0.009"/>  -->
     <arg name="offset_fixed_x" default="0.009"/>
     <arg name="offset_fixed_y" default="0.0345"/>
     <arg name="offset_fixed_z" default="0.195"/>

@@ -9,7 +9,7 @@ from camera_pkg_msgs.msg import Coordinate
 import rospy
 import cv_bridge
 import numpy as np
-from mg400_bringup.srv import MovL, DO, EnableRobot, DisableRobot, SpeedJ, AccJ, Sync, ClearError,JointMovJ,SetCollisionLevel
+from mg400_bringup.srv import MovL, DO, EnableRobot, DisableRobot, SpeedL, AccL, Sync, ClearError,JointMovJ,SetCollisionLevel
 from mg400_bringup.msg import ToolVectorActual, RobotStatus
 from std_srvs.srv import Empty
 from std_srvs.srv import EmptyResponse
@@ -26,8 +26,8 @@ class MOVE:
 		self.arm_move =rospy.ServiceProxy('/mg400_bringup/srv/MovL',MovL)
 		self.collision_level =rospy.ServiceProxy('/mg400_bringup/srv/SetCollisionLevel',SetCollisionLevel)
 		self.arm_reset =rospy.ServiceProxy('/arucodetect/reset',Empty)
-		self.set_SpeedJ =rospy.ServiceProxy('/mg400_bringup/srv/SpeedJ',SpeedJ)
-		self.set_AccJ =rospy.ServiceProxy('/mg400_bringup/srv/AccJ',AccJ)
+		self.set_SpeedL =rospy.ServiceProxy('/mg400_bringup/srv/SpeedL',SpeedL)
+		self.set_AccL =rospy.ServiceProxy('/mg400_bringup/srv/AccL',AccL)
 		self.arm_enable = rospy.ServiceProxy('/mg400_bringup/srv/EnableRobot',EnableRobot)
 		self.robot_coordinate = rospy.Subscriber("/mg400_bringup/msg/ToolVectorActual", ToolVectorActual, self.robotCoordinate_callback)
                 self.arm_disable = rospy.ServiceProxy('/mg400_bringup/srv/DisableRobot',DisableRobot)
@@ -91,8 +91,8 @@ class MOVE:
 		self.x_r_coefficient = [0,0,0]
 		self.y_r_coefficient = [0,0,0]
 		self.readCalibFile()
-		self.set_SpeedJ(40)
-		self.set_AccJ(40)
+		self.set_SpeedL(80)
+		self.set_AccL(80)
 		self.distance = 180
 		time.sleep(2)
 		self.arm_enable()
@@ -257,7 +257,10 @@ class MOVE:
 				self.y_a = msg.y*self.y_r_coefficient[0] + self.y_r_intercept
 				self.z_a = msg.z*self.z_r_coefficient + self.z_r_intercept
 				self._d = msg.z
-				self.arm_move(self.x_a*0.5,self.y_a, self.z_a-60, self.r_coordinate-msg.r)
+				_coef =0.5
+				if self.x_a < 300:
+					_coef = 0.7
+				self.arm_move(self.x_a*_coef,self.y_a, self.z_a-60, self.r_coordinate-msg.r)
                                 # z_a = -14
                                 # x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
 				# y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
