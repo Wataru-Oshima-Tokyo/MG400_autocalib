@@ -76,7 +76,7 @@ class MOVE:
 		self.z_i =0
 		self.r_i =0
 		self.angle = 0
-		self.coeficient =0.70
+		self.coeficient =0.65
 		self.Move = False
 		self.x_r_arr =[]
 		self.y_r_arr =[]
@@ -93,7 +93,7 @@ class MOVE:
 		self.readCalibFile()
 		self.set_SpeedL(80)
 		self.set_AccL(80)
-		self.distance = 180
+		self.distance = 120
 		time.sleep(2)
 		self.arm_enable()
 		time.sleep(2)
@@ -107,7 +107,7 @@ class MOVE:
 		self.move_stopper = False
 
 	def initValue(self):
-		self.distance = 180
+		self.distance = 120
 		self.r_coordinate = 150
 		self.angle = 0
 
@@ -200,7 +200,6 @@ class MOVE:
 		x = self.temp_x_r + msg.linear.x
 		y = self.temp_y_r + msg.linear.y
 		z = self.temp_z_r + msg.linear.z
-		# r = self.temp_r_r + msg.angular.z
 		r = self.r_coordinate
 		if not self.Move:
 			self.Move =True
@@ -257,10 +256,10 @@ class MOVE:
 				self.y_a = msg.y*self.y_r_coefficient[0] + self.y_r_intercept
 				self.z_a = msg.z*self.z_r_coefficient + self.z_r_intercept
 				self._d = msg.z
-				_coef =0.5
-				if self.x_a < 300:
-					_coef = 0.7
-				self.arm_move(self.x_a*_coef,self.y_a, self.z_a-60, self.r_coordinate-msg.r)
+				_coef =0.7
+				# if self.x_a < 300:
+				# 	_coef = 0.7
+				self.arm_move(self.x_a*_coef,self.y_a, self.z_a-100, self.r_coordinate-msg.r)
                                 # z_a = -14
                                 # x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
 				# y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
@@ -306,10 +305,16 @@ class MOVE:
 				self.z_calib=True
 			elif msg.t =="F":
 				self.getRobotCoordinate()
-					#180 is the dinstance from the camera to the object
-				if abs(self.angle/self.coeficient) > 20:
-					dis_coef = -0.00625*abs(self.angle/self.coeficient) + 1.075
-					angle_coef = -0.04041*abs(self.angle/self.coeficient) + 1.8783
+				self.arm_move(self.x_r,self.y_r, self.z_r+35, self.r_coordinate)
+				self.sync_robot()
+				self.getRobotCoordinate()
+					#115 is the dinstance from the camera to the object
+				if abs(self.angle/self.coeficient) >20:
+					# dis_coef = -0.00625*abs(self.angle/self.coeficient) + 1.075
+					dis_coef = -0.0040625*abs(self.angle/self.coeficient) + 1.036875
+					# angle_coef = -0.04041*abs(self.angle/self.coeficient) + 1.8783
+					angle_coef = -0.049338*abs(self.angle/self.coeficient) + 2.1907
+					print("dist_coef", dis_coef)
 					print("angle_coef", angle_coef)
 					d = self.distance/math.cos(math.radians(self.angle*angle_coef))
 					# d = self.distance/math.cos(math.radians(self.angle))
