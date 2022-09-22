@@ -122,13 +122,13 @@ class MOVE:
 		self.set_SpeedL(80)
 		self.set_AccL(80)
 		self.distance = self.init_distance
-		time.sleep(2)
+		rospy.sleep(2.)
 		self.arm_enable()
-		time.sleep(2)
+		rospy.sleep(2.)
 		while self.robot_mode == 0:
 			self.rate.sleep()
 		self.initialize()
-		time.sleep(2)
+		rospy.sleep(2.)
 		self.arm_move(self.place_x ,self.place_y,60, self.r_coordinate)
 		self.sync_robot()
 		self.move_stopper = False
@@ -138,13 +138,12 @@ class MOVE:
 		self.distance = self.init_distance
 		self.r_coordinate = self.init_r_coordinate
 		self.angle = 0
-
 	#initialze the robot 
 	def initialize(self):
 		self.arm_disable()
 		self.clear_error()
 		self.arm_enable()
-		time.sleep(2)
+		rospy.sleep(2)
 		while self.robot_mode !=5:
 			self.rate.sleep()
 		# self.joint_move(0,0,0,0)
@@ -205,7 +204,7 @@ class MOVE:
 	def sync_robot(self):
 			if self.robot_mode == 9:
 				self.initialize()
-			time.sleep(0.5)
+			rospy.sleep(0.5)
 			while self.robot_mode !=5:
 				if self.robot_mode == 9:
 					self.initialize()
@@ -355,7 +354,7 @@ class MOVE:
 		rospy.sleep(2.)
 		self.getRobotCoordinate()
 		result = "success"
-		if abs(b_r-self.r_r) > 2:
+		if abs(b_r-self.r_r) > 4:
 			result = "failed"
 		self.attempt+=1
 		# datetime object containing current date and time
@@ -492,7 +491,7 @@ class MOVE:
 		self.arm_enable()
 		self.pos_x =300
 		first_move = self.arm_move(self.pos_x, self.r_coordinate)
-		time.sleep(1)
+		rospy.sleep(1)
 		self.last_clb_time_ = rospy.get_time()
 		return EmptyResponse()
 
