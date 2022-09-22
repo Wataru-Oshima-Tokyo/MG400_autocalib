@@ -7,8 +7,9 @@
     <!-- <arg name="offset_fixed_x" default="0.009"/>  -->
     <arg name="offset_fixed_x" default="0.009"/>
     <arg name="offset_fixed_y" default="-0.0011"/>
-    <arg name="offset_fixed_z" default="0.1397"/>
+    <arg name="offset_fixed_z" default="0.1397"/> <!-- 0.1397-->
     <arg name="Kp" default="200.0"/>
+    <arg name="techshare" default="True"/>
     <arg name="calibration_path" default="$(find camera_pkg)/param"/> 
 
     <param name="robot_description" textfile="$(find mg400_description)/urdf/mg400_description.urdf"/>
@@ -22,10 +23,31 @@
      <node name="MG400_horizontal_move"
         pkg="MG400_basic"
         type="MG400_work_horizontal.py"
-        output="screen"/>
+        output="screen">
+     <param name="image_topic" type="bool" value="$(arg techare)"/>
+    </node>
 
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
     
+<<<<<<< HEAD
+=======
+     <node pkg="uvc_camera" type="uvc_camera_node" name="uvc_camera" output="screen" respawn="true">
+    <param name="width" type="int" value="640" />
+    <param name="height" type="int" value="480" />
+    <param name="fps" type="int" value="30" />
+    <param name="frame" type="string" value="wide_stereo" />
+
+    <param name="auto_focus" type="bool" value="False" />
+    <param name="focus_absolute" type="int" value="0" />
+    <!-- other supported params: auto_exposure, exposure_absolute, brightness, power_line_frequency -->
+
+    <param name="device" type="string" value="/dev/video0" />
+    <param name="camera_info_url" type="string" value="file://$(arg calibration_path)/camera.yaml" />
+    <remap from="/image_raw" to="/usb_cam/image_raw" />
+   </node>
+
+    
+>>>>>>> 739cc4c2b0a91c306c52c57c5eedd2b84d419217
 
     <node name="outlet_detector"
         pkg="camera_pkg"
