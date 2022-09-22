@@ -7,7 +7,7 @@
     <!-- <arg name="offset_fixed_x" default="0.009"/>  -->
     <arg name="offset_fixed_x" default="0.009"/>
     <arg name="offset_fixed_y" default="-0.0011"/>
-    <arg name="offset_fixed_z" default="0.1397"/>
+    <arg name="offset_fixed_z" default="0.1397"/> <!-- 0.1397-->
     <arg name="Kp" default="200.0"/>
     <arg name="calibration_path" default="$(find camera_pkg)/param"/> 
 

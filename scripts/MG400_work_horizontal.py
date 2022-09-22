@@ -19,51 +19,58 @@ import math
 class MOVE:
 	def __init__(self):
 		print("start MG400")
-                home = os.environ["HOME"]
+		home = os.environ["HOME"]
+		# calibration files
 		self.xy_filepath = home + "/catkin_ws/src/MG400_basic/files/xy_calibration_horizontal.txt"
 		self.z_filepath = home + "/catkin_ws/src/MG400_basic//files/z_calibration_horizontal.txt"
-		self.r_filepath = home + "/catkin_ws/src/MG400_basic//files/r_calibration_horizontal.txt"
+
+		# MG400 services
 		self.arm_move =rospy.ServiceProxy('/mg400_bringup/srv/MovL',MovL)
 		self.collision_level =rospy.ServiceProxy('/mg400_bringup/srv/SetCollisionLevel',SetCollisionLevel)
 		self.arm_reset =rospy.ServiceProxy('/arucodetect/reset',Empty)
 		self.set_SpeedL =rospy.ServiceProxy('/mg400_bringup/srv/SpeedL',SpeedL)
 		self.set_AccL =rospy.ServiceProxy('/mg400_bringup/srv/AccL',AccL)
 		self.arm_enable = rospy.ServiceProxy('/mg400_bringup/srv/EnableRobot',EnableRobot)
-		self.robot_coordinate = rospy.Subscriber("/mg400_bringup/msg/ToolVectorActual", ToolVectorActual, self.robotCoordinate_callback)
-                self.arm_disable = rospy.ServiceProxy('/mg400_bringup/srv/DisableRobot',DisableRobot)
+		self.arm_disable = rospy.ServiceProxy('/mg400_bringup/srv/DisableRobot',DisableRobot)
 		self.suction = rospy.ServiceProxy('/mg400_bringup/srv/DO', DO)
 		self.clear_error = rospy.ServiceProxy('/mg400_bringup/srv/ClearError',ClearError)
-		#self.robot_sync = rospy.ServiceProxy('/mg400_bringup/srv/Sync',Sync)
 		self.joint_move = rospy.ServiceProxy('/mg400_bringup/srv/JointMovJ',JointMovJ)
-		self.sub = rospy.Subscriber("/outlet/coordinate", Coordinate, self.image_callback)
-		self.mg400_dsth = rospy.Publisher("/mg400/working", Bool, queue_size=100)
-		self.work_start_srv_ = rospy.Service('/mg400_work/start', Empty, self.work_start_service)
-                self.twist_pub = rospy.Subscriber('/mg400/cmd_vel', Twist, self.twist_callback)
-		self.robot_mode_sub = rospy.Subscriber('/mg400_bringup/msg/RobotStatus', RobotStatus, self.robotStatus_callback)
+		self.robot_coordinate = rospy.Subscriber("/mg400_bringup/msg/ToolVectorActual", ToolVectorActual, self.robotCoordinate_callback)
+		
+		# camera_pkg services
 		self.work_stop_srv_ = rospy.Service('/mg400_work/stop', Empty, self.work_stop_service)
 		self.xy_calib_start_srv = rospy.Service('/xy_calibration/start', Empty, self.xy_calib_start_service)
 		self.xy_calib_stop_srv = rospy.Service('/xy_calibration/stop', Empty, self.xy_calib_stop_service)
 		self.z_calib_start_srv = rospy.Service('/z_calibration/start', Empty, self.z_calib_start_service)
 		self.z_calib_stop_srv = rospy.Service('/z_calibration/stop', Empty, self.z_calib_stop_service)
 		self.sub_jointState = rospy.Subscriber('/mg400_bringup/srv/ok', Twist, self.twist_callback)
+		self.work_start_srv_ = rospy.Service('/mg400_work/start', Empty, self.work_start_service)
+
+
+		#Subscribers
+		self.sub = rospy.Subscriber("/outlet/coordinate", Coordinate, self.image_callback)
+		self.twist_pub = rospy.Subscriber('/mg400/cmd_vel', Twist, self.twist_callback)
+		self.robot_mode_sub = rospy.Subscriber('/mg400_bringup/msg/RobotStatus', RobotStatus, self.robotStatus_callback)
+
+		#Publishers
+		self.mg400_dsth = rospy.Publisher("/mg400/working", Bool, queue_size=100)
+
+
+		# variables
 		self.camera_coordinate_x =np.array([[]])
 		self.camera_coordinate_y =np.array([[]])
 		self.camera_coordinate_z =np.array([[]])
-		self.now = time.time()
-		self.end = time.time()
 		self.xy_calib = False
 		self.z_calib = False
 		self.robot_mode = 0
-                self.robot_mode_prev = 0
 		self.rate = rospy.Rate(20)
-                self.move_stopper= True
+		self.move_stopper= True
 		self.camera_z = np.array([[]])
-                self.RUN = 0
+		self.RUN = 0
 		self.place_y=240
 		self.place_x=154
-                self.r_coordinate = 150
-                self.TIMEOUT = 0.5
-		self.ast_clb_time_ = rospy.get_time()
+		self.init_r_coordinate =150
+		self.r_coordinate = self.init_r_coordinate
 		self.x_a =0
 		self.y_a =0
 		self.z_a =0
@@ -76,6 +83,7 @@ class MOVE:
 		self.z_i =0
 		self.r_i =0
 		self.angle = 0
+		self.init_distance = 120
 		self.coeficient =0.65
 		self.Move = False
 		self.x_r_arr =[]
@@ -90,36 +98,46 @@ class MOVE:
 		self.r_r_intercept = 0
 		self.x_r_coefficient = [0,0,0]
 		self.y_r_coefficient = [0,0,0]
+
+
+		# start up
+		self.start_up()
+
+	#start up move
+	def start_up(self):
 		self.readCalibFile()
 		self.set_SpeedL(80)
 		self.set_AccL(80)
-		self.distance = 120
+		self.distance = self.init_distance
 		time.sleep(2)
 		self.arm_enable()
 		time.sleep(2)
-                while self.robot_mode == 0:
-                    self.rate.sleep()
-		
+		while self.robot_mode == 0:
+			self.rate.sleep()
 		self.initialize()
 		time.sleep(2)
 		self.arm_move(self.place_x ,self.place_y,60, self.r_coordinate)
 		self.sync_robot()
 		self.move_stopper = False
 
+	#initialize the values
 	def initValue(self):
-		self.distance = 120
-		self.r_coordinate = 150
+		self.distance = self.init_distance
+		self.r_coordinate = self.init_r_coordinate
 		self.angle = 0
 
+	#initialze the robot 
 	def initialize(self):
 		self.arm_disable()
 		self.clear_error()
 		self.arm_enable()
-                time.sleep(2)
-                while self.robot_mode !=5:
-                    self.rate.sleep()
+		time.sleep(2)
+		while self.robot_mode !=5:
+			self.rate.sleep()
 		# self.joint_move(0,0,0,0)
 
+
+	#read the calibration file
 	def readCalibFile(self):
 		try:
 			with open(self.xy_filepath,"r") as file:	
@@ -146,16 +164,14 @@ class MOVE:
 					line = file.read()
 			line = line.split(",")
 			print(line)
-                        for i in range(len(line)):
+			for i in range(len(line)):
 				self.z_r_coefficient = float(line[0])
 				self.z_r_intercept = float(line[1])
-			# for i in range(len(line)):
-			# 	self.r_r_coefficient = float(line[0])
-			# 	self.r_r_intercept = float(line[1])
-			# print("done reading calib file ")
 		except Exception as e:
 			print(e)
-			
+
+
+	#get the robot status
 	def robotStatus_callback(self, robot_status):
 		"""
 		    1:	"ROBOT_MODE_INIT",
@@ -172,6 +188,7 @@ class MOVE:
 		"""
 		self.robot_mode = robot_status.robot_status
 
+	#wait until the robot stops moving
 	def sync_robot(self):
 			if self.robot_mode == 9:
 				self.initialize()
@@ -183,19 +200,21 @@ class MOVE:
 				self.rate.sleep()
 			self.Move = False				
 	
-	
+	#determine the current posiiton 
 	def getRobotCoordinate(self):
 		self.x_r = self.temp_x_r
 		self.y_r = self.temp_y_r
 		self.z_r = self.temp_z_r
 		self.r_r = self.temp_r_r
 
+	#getting the robot xyz position as soon as they are published
 	def robotCoordinate_callback(self, coordinate):
 		self.temp_x_r = coordinate.x
 		self.temp_y_r = coordinate.y
 		self.temp_z_r = coordinate.z
 		self.temp_r_r = coordinate.r
 
+	# move the arm based on cmd_vel
 	def twist_callback(self, msg):
 		x = self.temp_x_r + msg.linear.x
 		y = self.temp_y_r + msg.linear.y
@@ -205,6 +224,142 @@ class MOVE:
 			self.Move =True
 			self.arm_move(x, y, z, r)
 			self.sync_robot()
+
+	#decided the angle and distance coefcient
+	def get_coefficients(self, angle):
+			dist_coef = -0.00420*abs(angle) + 1.01260
+			# angle_coef = -0.049338*abs(angle) + 2.1907
+			angle_coef = -0.008857*abs(angle) +0.87428
+			return dist_coef, angle_coef
+
+	#if calibration command is on
+	def calib_arm_command(self, msg):
+		if msg.t =="L":
+			self.getRobotCoordinate()
+			self.pre_x_r=self.x_r
+			self.pre_y_r=self.y_r
+			self.pre_z_r=self.z_r
+		elif msg.t =="R":
+			self.x_i = msg.x
+			self.y_i = msg.y
+			self.z_i = msg.z
+			self.addCoordinate()
+		elif msg.t =="M":
+			self.calibration()
+
+
+	#the first move based on the realsense
+	def L_move(self,msg):
+		if self.robot_mode == 9:
+			self.initialize()
+		msgs = [msg.x, msg.y, msg.z]  
+		self.x_a, self.y_a =0,0
+		self.x_a = msg.x*self.x_r_coefficient[0] + self.x_r_intercept
+		self.y_a = msg.y*self.y_r_coefficient[0] + self.y_r_intercept
+		self.z_a = msg.z*self.z_r_coefficient + self.z_r_intercept
+		self._d = msg.z
+		_coef =0.7
+		self.arm_move(self.x_a*_coef,self.y_a, self.z_a-90, self.r_coordinate-msg.r)
+		
+		self.sync_robot()
+		self.mg400_dsth.publish(False)
+
+	#after the arm reached the first position
+	def D_move(self, msg):
+		# added by the angle
+		self.getRobotCoordinate()
+		self.angle = msg.r * self.coeficient
+		if msg.r  <-5 and msg.r  >-40:
+			self.angle *=1.296
+		self.r_coordinate -= self.angle 
+		d = self.distance/math.cos(math.radians(self.angle/self.coeficient))
+		_y = d * math.sin(math.radians(self.angle/self.coeficient))
+		_x = self.distance -  self.distance * math.cos(math.radians(self.angle/self.coeficient)) -10
+		self.arm_move(self.x_r+_x, self.y_r + _y, self.z_r, self.r_coordinate)
+
+	#adujst the angle move
+	def A_move(self, msg):
+		self.getRobotCoordinate()
+		self.angle += msg.r * self.coeficient
+		self.r_coordinate -= msg.r * self.coeficient
+		self.arm_move(self.x_r, self.y_r, self.z_r, self.r_coordinate)
+
+	#Initialize_move
+	def I_move(self,msg):
+		self.initValue()
+		self.arm_enable()
+		rospy.sleep(2.)
+		self.getRobotCoordinate()
+		#rotate the endeffector to remove itself from the outlet
+		_ex = 90
+		if self.r_r >150:
+				_ex *=-1
+		#reset behavior
+		self.arm_move(self.x_r- 40, self.y_r-_ex, self.z_r, self.r_r+_ex)
+		self.sync_robot()
+		self.arm_move(self.place_x ,self.place_y,60, self.r_coordinate)
+		self.sync_robot()
+
+	#final move	
+	def F_move(self, msg):
+		self.getRobotCoordinate()
+		self.arm_move(self.x_r,self.y_r, self.z_r+35, self.r_coordinate)
+		self.sync_robot()
+		self.getRobotCoordinate()
+			#115 is the dinstance from the camera to the object
+
+		d = self.distance/math.cos(math.radians(self.angle/self.coeficient))
+		dis_coef, angle_coef = self.get_coefficients(self.angle/self.coeficient)
+		_y = d* math.sin(math.radians(self.angle/self.coeficient))*angle_coef
+		_x = d* math.cos(math.radians(self.angle/self.coeficient))*dis_coef
+		print("d: ", d)
+		print("dist_coef", dis_coef)
+		print("angle_coef", angle_coef)
+		# self.distance *= 0.85
+		# _y = angle_coef
+		
+
+		if self.angle/self.coeficient <-15:
+			_x *= 1.04
+		print("y_adjustment",_y)
+		print("angle", self.angle/self.coeficient)
+		if self.x_r+_x <450:
+			self.arm_move(self.x_r+_x,self.y_r-_y, self.z_r, self.r_coordinate)
+			
+		# self.arm_move(self.x_r+self.distance, self.y_r-_y, self.z_r, self.r_coordinate)
+		else:
+			print("out of range")
+			self.arm_reset()
+
+		self.sync_robot()
+		self.arm_disable()
+
+
+# chunk of commands
+	def execute_arm_commnd(self, msg):
+		if msg.t =="L":
+			self.L_move(msg)
+		elif msg.t == "D":
+			self.D_move(msg)
+		elif msg.t == "A":
+			self.A_move(msg)
+		elif msg.t == "I":
+			self.I_move(msg)
+		elif msg.t =="R":
+			self.xy_calib=True
+		elif msg.t =="M":
+			self.z_calib=True
+		elif msg.t =="F":
+			self.F_move(msg)
+		else:
+			pass
+
+	def arm_command(self, msg):
+		if self.xy_calib or self.z_calib:
+			self.calib_arm_command(msg)
+		else:
+			self.execute_arm_commnd(msg)
+
 
 	def image_callback(self, msg):
 		#initial postion for MG400 in image coordinate is 566(x),145(y) and robot coordination is (300, 0)
@@ -219,128 +374,7 @@ class MOVE:
 		msg.y = msg.x
 		msg.x = msg.z
 		msg.z = temp
-		print("y:", msg.y)
-		if self.xy_calib or self.z_calib:
-			if msg.t =="L":
-                                #self.arm_enable()
-				self.getRobotCoordinate()
-				#self.arm_move(self.x_r, self.y_r, 0, 0, 0, 0)
-				#self.arm_move(4.20, 250, 30, 0, 0, 0)
-				self.pre_x_r=self.x_r
-				self.pre_y_r=self.y_r
-				self.pre_z_r=self.z_r
-			elif msg.t =="R":
-				#z,y,x of image coordination correspons to x,y,z of robot coordination
-				self.x_i = msg.x
-				self.y_i = msg.y
-				self.z_i = msg.z
-				self.addCoordinate()
-				#self.arm_move(self.pre_x_r, self.pre_y_r, self.pre_z_r+20, 0, 0, 0)
-                                #self.arm_disable()
-			elif msg.t =="M":
-				print("here")
-# 				self.cancelAppend()
-				self.calibration()
-				pass
-		else:
-			if msg.t =="L":
-				if self.robot_mode == 9:
-					self.initialize()
-				msgs = [msg.x, msg.y, msg.z]  
-				self.x_a, self.y_a =0,0
-				# for i in range(len(self.x_r_coefficient)):
-				# 	self.x_a += msgs[0]*self.x_r_coefficient[i]
-				# for i in range(len(self.y_r_coefficient)):
-				# 	self.y_a += msgs[1]*self.y_r_coefficient[i]
-				self.x_a = msg.x*self.x_r_coefficient[0] + self.x_r_intercept
-				self.y_a = msg.y*self.y_r_coefficient[0] + self.y_r_intercept
-				self.z_a = msg.z*self.z_r_coefficient + self.z_r_intercept
-				self._d = msg.z
-				_coef =0.7
-				# if self.x_a < 300:
-				# 	_coef = 0.7
-				self.arm_move(self.x_a*_coef,self.y_a, self.z_a-100, self.r_coordinate-msg.r)
-                                # z_a = -14
-                                # x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
-				# y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
-				
-				self.sync_robot()
-				# self.arm_move(x_a,y_a,z_a, _r)
-				# self.sync_robot()
-				self.mg400_dsth.publish(False)
-
-			elif msg.t == "D":
-				# added by the angle
-				self.getRobotCoordinate()
-				self.angle = msg.r * self.coeficient
-				self.r_coordinate -= self.angle
-				_y = self.distance * math.sin(math.radians(self.angle/self.coeficient))
-				_x = self.distance -  self.distance * math.cos(math.radians(self.angle/self.coeficient)) -10
-				self.arm_move(self.x_r+_x, self.y_r + _y, self.z_r, self.r_coordinate)
-			elif msg.t == "A":
-				self.getRobotCoordinate()
-				self.angle += msg.r *self.coeficient
-				self.r_coordinate -= msg.r *self.coeficient
-				self.arm_move(self.x_r, self.y_r, self.z_r, self.r_coordinate)
-			elif msg.t == "I":
-				time.sleep(2)
-				self.arm_enable()
-				time.sleep(2)
-				self.initValue()
-				self.getRobotCoordinate()
-				#rotate the endeffector to remove itself from the outlet
-				_ex = 90
-				if self.r_r >150:
-					_ex *=-1
-				
-				self.arm_move(self.x_r- 20, self.y_r-_ex, self.z_r, self.r_r+_ex)
-				self.sync_robot()
-				self.arm_move(self.place_x ,self.place_y,60, self.r_coordinate)
-				self.sync_robot()
-			elif msg.t =="R":
-				# self.xy_calib_start_service(Empty)
-				self.xy_calib=True
-			elif msg.t =="M":
-				# self.z_calib_start_service(Empty)
-				self.z_calib=True
-			elif msg.t =="F":
-				self.getRobotCoordinate()
-				self.arm_move(self.x_r,self.y_r, self.z_r+35, self.r_coordinate)
-				self.sync_robot()
-				self.getRobotCoordinate()
-					#115 is the dinstance from the camera to the object
-				if abs(self.angle/self.coeficient) >20:
-					# dis_coef = -0.00625*abs(self.angle/self.coeficient) + 1.075
-					dis_coef = -0.0040625*abs(self.angle/self.coeficient) + 1.036875
-					# angle_coef = -0.04041*abs(self.angle/self.coeficient) + 1.8783
-					angle_coef = -0.049338*abs(self.angle/self.coeficient) + 2.1907
-					print("dist_coef", dis_coef)
-					print("angle_coef", angle_coef)
-					d = self.distance/math.cos(math.radians(self.angle*angle_coef))
-					# d = self.distance/math.cos(math.radians(self.angle))
-					self.distance *= dis_coef
-				else: 
-					d = self.distance/math.cos(math.radians(self.angle))
-				_x = self.distance* math.cos(math.radians(self.angle))
-				_y = d* math.sin(math.radians(self.angle)) 
-				if self.angle/self.coeficient <-30:
-					self.distance *= 1.04
-					# _y_coef = 0.02*(self.angle/self.coeficient) +1.2
-					# _y *=_y_coef
-					
-				# _y = self.distance* math.sin(math.radians(self.angle)) 
-				print("y_adjustment",_y)
-				print("distance", self._d)
-				print("angle", self.angle/self.coeficient)
-				if self.x_r+self.distance <450:
-					self.arm_move(self.x_r+self.distance,self.y_r-_y, self.z_r, self.r_coordinate)
-				# self.arm_move(self.x_r+self.distance, self.y_r-_y, self.z_r, self.r_coordinate)
-				else:
-					print("out of range")
-					self.arm_reset()
-
-				self.sync_robot()
-				self.arm_disable()
+		self.arm_command(msg)
 
 		self.last_clb_time_ = rospy.get_time()
 
@@ -418,7 +452,7 @@ class MOVE:
 	def work_start_service(self,req):
 		print("start movement ")
 		self.RUN = 1
-                self.arm_enable()
+		self.arm_enable()
 		self.pos_x =300
 		first_move = self.arm_move(self.pos_x, self.r_coordinate)
 		time.sleep(1)
@@ -429,7 +463,7 @@ class MOVE:
 	def work_stop_service(self,req):
 		print("stop movement")
 		self.RUN = 0
-                self.arm_disable()
+		self.arm_disable()
 		return EmptyResponse()
 	
 	def xy_calib_start_service(self,req):
