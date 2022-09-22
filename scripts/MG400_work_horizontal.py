@@ -23,15 +23,21 @@ class MOVE:
 		print("start MG400")
 		home = os.environ["HOME"]
 		now = datetime.now()
-		dt_string = now.strftime("%d/%m/%Y")
+		dt_string = now.strftime("%d-%m-%Y")
 		
 		#get parameters
-		techshare = rospy.get_param("techshare") #TRUE OR NOT
+		techshare = rospy.get_param("techshare",0) #TRUE OR NOT
 		
-		# calibration files
-		self.xy_filepath = home + "/catkin_ws/src/MG400_basic/files/xy_calibration_horizontal.txt"
-		self.z_filepath = home + "/catkin_ws/src/MG400_basic//files/z_calibration_horizontal.txt"
-		self.result_file = home + "/catkin_ws/src/MG400_basic//files/" + dt_string + "results.txt"
+		# calibration files and inital value
+		if techshare:
+			self.init_distance = 88
+			self.xy_filepath = home + "/catkin_ws/src/MG400_basic/files/tec_xy_calibration_horizontal.txt"
+			self.z_filepath = home + "/catkin_ws/src/MG400_basic/files/tec_z_calibration_horizontal.txt"
+		else:
+			self.init_distance = 120
+			self.xy_filepath = home + "/catkin_ws/src/MG400_basic/files/xy_calibration_horizontal.txt"
+			self.z_filepath = home + "/catkin_ws/src/MG400_basic/files/z_calibration_horizontal.txt"
+		self.result_file = home + "/catkin_ws/src/MG400_basic/files/" + dt_string + "-results.txt"
 		# MG400 services
 		self.arm_move =rospy.ServiceProxy('/mg400_bringup/srv/MovL',MovL)
 		self.collision_level =rospy.ServiceProxy('/mg400_bringup/srv/SetCollisionLevel',SetCollisionLevel)
@@ -94,10 +100,7 @@ class MOVE:
 		self.r_i =0
 		self.angle = 0
 		self.attempt=0
-		if techshare:
-			self.init_distance = 88
-		else:
-			self.init_distance = 122
+		print("initial distance is:", self.init_distance)
 		self.coeficient =0.65
 		self.Move = False
 		self.x_r_arr =[]
@@ -354,19 +357,23 @@ class MOVE:
 		self.arm_disable()
 		rospy.sleep(2.)
 		self.getRobotCoordinate()
-		result = "success"
+		result = 1
 		if abs(b_r-self.r_r) > 4:
-			result = "failed"
+			result = 0
 		self.attempt+=1
 		# datetime object containing current date and time
 		now = datetime.now()
 		# dd/mm/YY H:M:S
-		dt_string = now.strftime("%d/%m/%Y %H:%M:%S")	
-		with open(self.result_file,"a") as f:
-			f.write(str(dt_string)+'\n')
-			f.write("attempt: "+ str(self.attempt)+'\n')
-			f.write("angle: " +str(self.angle/self.coeficient)+'\n')
-			f.write("result: "+ result+'\n')
+		dt_string = now.strftime("%Y/%m/%d-%H:%M:%S")	
+		with open(self.result_file,"a+") as f:
+			f.write(str(dt_string)+' ')
+			f.write("大島 ")
+			f.write(str(self.angle/self.coeficient) +' ')
+			f.write(str(self._d) +' ')
+			f.write(str(result)+'\n')
+			# f.write("attempt: "+ str(self.attempt)+'\n')
+			# f.write("angle: " +str(self.angle/self.coeficient)+'\n')
+			# f.write("result: "+ result+'\n')
 		rospy.sleep(2.)
 		self.arm_reset()
 
