@@ -17,6 +17,7 @@ from sklearn.linear_model import LinearRegression
 import time
 import math
 from datetime import datetime
+
 class MOVE:
 	def __init__(self):
 		print("start MG400")
