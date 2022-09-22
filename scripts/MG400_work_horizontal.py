@@ -16,18 +16,25 @@ from std_srvs.srv import EmptyResponse
 from sklearn.linear_model import LinearRegression
 import time
 import math
+from datetime import datetime
 class MOVE:
 	def __init__(self):
 		print("start MG400")
 		home = os.environ["HOME"]
+		now = datetime.now()
+		dt_string = now.strftime("%d/%m/%Y")
+		
+		#get parameters
+		techshare = rospy.get_param("techshare") #TRUE OR NOT
+		
 		# calibration files
 		self.xy_filepath = home + "/catkin_ws/src/MG400_basic/files/xy_calibration_horizontal.txt"
 		self.z_filepath = home + "/catkin_ws/src/MG400_basic//files/z_calibration_horizontal.txt"
-
+		self.result_file = home + "/catkin_ws/src/MG400_basic//files/" + dt_string + "results.txt"
 		# MG400 services
 		self.arm_move =rospy.ServiceProxy('/mg400_bringup/srv/MovL',MovL)
 		self.collision_level =rospy.ServiceProxy('/mg400_bringup/srv/SetCollisionLevel',SetCollisionLevel)
-		self.arm_reset =rospy.ServiceProxy('/arucodetect/reset',Empty)
+		
 		self.set_SpeedL =rospy.ServiceProxy('/mg400_bringup/srv/SpeedL',SpeedL)
 		self.set_AccL =rospy.ServiceProxy('/mg400_bringup/srv/AccL',AccL)
 		self.arm_enable = rospy.ServiceProxy('/mg400_bringup/srv/EnableRobot',EnableRobot)
@@ -45,7 +52,9 @@ class MOVE:
 		self.z_calib_stop_srv = rospy.Service('/z_calibration/stop', Empty, self.z_calib_stop_service)
 		self.sub_jointState = rospy.Subscriber('/mg400_bringup/srv/ok', Twist, self.twist_callback)
 		self.work_start_srv_ = rospy.Service('/mg400_work/start', Empty, self.work_start_service)
-
+		self.arm_reset =rospy.ServiceProxy('/arucodetect/reset',Empty)
+		self.detect_start =rospy.ServiceProxy('/arucodetect/start',Empty)
+		
 
 		#Subscribers
 		self.sub = rospy.Subscriber("/outlet/coordinate", Coordinate, self.image_callback)
@@ -83,7 +92,11 @@ class MOVE:
 		self.z_i =0
 		self.r_i =0
 		self.angle = 0
-		self.init_distance = 120
+		self.attempt=0
+		if techshare:
+			self.init_distance = 88
+		else:
+			self.init_distance = 122
 		self.coeficient =0.65
 		self.Move = False
 		self.x_r_arr =[]
@@ -259,7 +272,7 @@ class MOVE:
 		self.z_a = msg.z*self.z_r_coefficient + self.z_r_intercept
 		self._d = msg.z
 		_coef =0.7
-		self.arm_move(self.x_a*_coef,self.y_a, self.z_a-90, self.r_coordinate-msg.r)
+		self.arm_move(self.x_a*_coef,self.y_a, self.z_a-80, self.r_coordinate-msg.r)
 		
 		self.sync_robot()
 		self.mg400_dsth.publish(False)
@@ -300,6 +313,10 @@ class MOVE:
 		self.arm_move(self.place_x ,self.place_y,60, self.r_coordinate)
 		self.sync_robot()
 
+		#start detecting (this is for experiment)
+		self.detect_start()
+
+
 	#final move	
 	def F_move(self, msg):
 		self.getRobotCoordinate()
@@ -332,7 +349,27 @@ class MOVE:
 			self.arm_reset()
 
 		self.sync_robot()
+		self.getRobotCoordinate()
+		b_r = self.r_r
 		self.arm_disable()
+		rospy.sleep(2.)
+		self.getRobotCoordinate()
+		result = "success"
+		if abs(b_r-self.r_r) > 2:
+			result = "failed"
+		self.attempt+=1
+		# datetime object containing current date and time
+		now = datetime.now()
+		# dd/mm/YY H:M:S
+		dt_string = now.strftime("%d/%m/%Y %H:%M:%S")	
+		with open(self.result_file,"a") as f:
+			f.write(str(dt_string)+'\n')
+			f.write("attempt: "+ str(self.attempt)+'\n')
+			f.write("angle: " +str(self.angle/self.coeficient)+'\n')
+			f.write("result: "+ result+'\n')
+		rospy.sleep(2.)
+		self.arm_reset()
+
 
 
 # chunk of commands
@@ -456,7 +493,7 @@ class MOVE:
 		self.pos_x =300
 		first_move = self.arm_move(self.pos_x, self.r_coordinate)
 		time.sleep(1)
-                self.last_clb_time_ = rospy.get_time()
+		self.last_clb_time_ = rospy.get_time()
 		return EmptyResponse()
 
 
