@@ -93,7 +93,7 @@ class MOVE:
 		self.readCalibFile()
 		self.set_SpeedL(80)
 		self.set_AccL(80)
-		self.distance = 120
+		self.distance = 92#88
 		time.sleep(2)
 		self.arm_enable()
 		time.sleep(2)
@@ -107,7 +107,7 @@ class MOVE:
 		self.move_stopper = False
 
 	def initValue(self):
-		self.distance = 120
+		self.distance = 92#88
 		self.r_coordinate = 150
 		self.angle = 0
 
@@ -259,7 +259,7 @@ class MOVE:
 				_coef =0.7
 				# if self.x_a < 300:
 				# 	_coef = 0.7
-				self.arm_move(self.x_a*_coef,self.y_a, self.z_a-100, self.r_coordinate-msg.r)
+				self.arm_move(self.x_a*_coef,self.y_a, self.z_a-60, self.r_coordinate-msg.r)
                                 # z_a = -14
                                 # x_a = msg.x*self.xx_coefficient + msg.y*self.xy_coefficient + msg.z*self.xz_coefficient +self.x_intercept
 				# y_a = msg.x*self.yx_coefficient + msg.y*self.yy_coefficient + msg.z*self.yz_coefficient+self.y_intercept
@@ -283,17 +283,18 @@ class MOVE:
 				self.r_coordinate -= msg.r *self.coeficient
 				self.arm_move(self.x_r, self.y_r, self.z_r, self.r_coordinate)
 			elif msg.t == "I":
-				time.sleep(2)
+                                self.initValue()
 				self.arm_enable()
-				time.sleep(2)
-				self.initValue()
+				# now_ = rospy.get_rostime()
+				# time_ = rospy.get_rostime() + rospy.Time(2)
+				rospy.sleep(2.)
 				self.getRobotCoordinate()
 				#rotate the endeffector to remove itself from the outlet
 				_ex = 90
 				if self.r_r >150:
 					_ex *=-1
 				
-				self.arm_move(self.x_r- 20, self.y_r-_ex, self.z_r, self.r_r+_ex)
+				self.arm_move(self.x_r- 40, self.y_r-_ex, self.z_r, self.r_r+_ex)
 				self.sync_robot()
 				self.arm_move(self.place_x ,self.place_y,60, self.r_coordinate)
 				self.sync_robot()
@@ -305,7 +306,7 @@ class MOVE:
 				self.z_calib=True
 			elif msg.t =="F":
 				self.getRobotCoordinate()
-				self.arm_move(self.x_r,self.y_r, self.z_r+35, self.r_coordinate)
+				self.arm_move(self.x_r,self.y_r, self.z_r+8, self.r_coordinate)
 				self.sync_robot()
 				self.getRobotCoordinate()
 					#115 is the dinstance from the camera to the object
