@@ -142,6 +142,7 @@ class MOVE:
 		self.distance = self.init_distance
 		self.r_coordinate = self.init_r_coordinate
 		self.angle = 0
+
 	#initialze the robot 
 	def initialize(self):
 		self.arm_disable()
@@ -243,10 +244,24 @@ class MOVE:
 
 	#decided the angle and distance coefcient
 	def get_coefficients(self, angle):
+		dist_coef, angle_coef =1,1
+		if angle < 40 and angle>=0:
 			dist_coef = -0.00420*abs(angle) + 1.01260
-			# angle_coef = -0.049338*abs(angle) + 2.1907
-			angle_coef = -0.008857*abs(angle) +0.87428
-			return dist_coef, angle_coef
+			angle_coef = -0.008857* abs(angle) +0.87428
+		elif angle >=40:
+			pass
+		elif angle <0 and angle >= -30:
+			dist_coef = -0.00420*abs(angle) + 1.01260
+			angle_coef = -0.008857* abs(angle) +0.8828
+		elif angle <-30 and angle>-40:
+			dist_coef = -0.00676*abs(angle) + 1.1133
+			# angle_coef = -0.00981*abs(angle) + 0.79615
+			angle_coef = 0.0159125*abs(angle) -0.081025
+		elif angle <= -40:
+			dist_coef = -0.004*abs(angle) + 1.022
+			angle_coef = 0.00115*abs(angle) + 0.42455
+		return dist_coef, angle_coef
+
 
 	#if calibration command is on
 	def calib_arm_command(self, msg):
@@ -285,8 +300,6 @@ class MOVE:
 		# added by the angle
 		self.getRobotCoordinate()
 		self.angle = msg.r * self.coeficient
-		if msg.r  <-5 and msg.r  >-40:
-			self.angle *=1.296
 		self.r_coordinate -= self.angle 
 		d = self.distance/math.cos(math.radians(self.angle/self.coeficient))
 		_y = d * math.sin(math.radians(self.angle/self.coeficient))
@@ -333,20 +346,17 @@ class MOVE:
 		_y = d* math.sin(math.radians(self.angle/self.coeficient))*angle_coef
 		_x = d* math.cos(math.radians(self.angle/self.coeficient))*dis_coef
 		print("d: ", d)
+		print("d*sinx",d* math.sin(math.radians(self.angle/self.coeficient)))
 		print("dist_coef", dis_coef)
 		print("angle_coef", angle_coef)
 		# self.distance *= 0.85
 		# _y = angle_coef
-		
-
-		if self.angle/self.coeficient <-15:
-			_x *= 1.04
+	
 		print("y_adjustment",_y)
 		print("angle", self.angle/self.coeficient)
 		if self.x_r+_x <450:
 			self.arm_move(self.x_r+_x,self.y_r-_y, self.z_r, self.r_coordinate)
-			
-		# self.arm_move(self.x_r+self.distance, self.y_r-_y, self.z_r, self.r_coordinate)
+			pass
 		else:
 			print("out of range")
 			self.arm_reset()
@@ -354,28 +364,26 @@ class MOVE:
 		self.sync_robot()
 		self.getRobotCoordinate()
 		b_r = self.r_r
+		b_y = self.y_r
 		self.arm_disable()
 		rospy.sleep(2.)
 		self.getRobotCoordinate()
 		result = 1
-		if abs(b_r-self.r_r) > 4:
+		if abs(b_r-self.r_r) > 4 or abs(b_y-self.y_r)>10:
 			result = 0
 		self.attempt+=1
 		# datetime object containing current date and time
 		now = datetime.now()
 		# dd/mm/YY H:M:S
 		dt_string = now.strftime("%Y/%m/%d-%H:%M:%S")	
-		with open(self.result_file,"a+") as f:
-			f.write(str(dt_string)+' ')
-			f.write("大島 ")
-			f.write(str(self.angle/self.coeficient) +' ')
-			f.write(str(self._d) +' ')
-			f.write(str(result)+'\n')
-			# f.write("attempt: "+ str(self.attempt)+'\n')
-			# f.write("angle: " +str(self.angle/self.coeficient)+'\n')
-			# f.write("result: "+ result+'\n')
-		rospy.sleep(2.)
-		self.arm_reset()
+		# with open(self.result_file,"a+") as f:
+		# 	f.write(str(dt_string)+' ')
+		# 	f.write("大島 ")
+		# 	f.write(str(self.angle/self.coeficient) +' ')
+		# 	f.write(str(self._d) +' ')
+		# 	f.write(str(result)+'\n')
+		# rospy.sleep(2.)
+		# self.arm_reset()
 
 
 
