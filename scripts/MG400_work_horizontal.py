@@ -26,15 +26,20 @@ class MOVE:
 		dt_string = now.strftime("%d-%m-%Y")
 		
 		#get parameters
-		techshare = rospy.get_param("techshare",0) #TRUE OR NOT
+		techshare = rospy.get_param("~techshare") #TRUE OR NOT
 		
 		# calibration files and inital value
-		if techshare:
-			self.init_distance = 88
+		print("techshare", techshare)
+		if techshare==1:
+			self.init_distance = 92#110#88
+			self.f_height = 8
+			self.first_height = 70
 			self.xy_filepath = home + "/catkin_ws/src/MG400_basic/files/tec_xy_calibration_horizontal.txt"
 			self.z_filepath = home + "/catkin_ws/src/MG400_basic/files/tec_z_calibration_horizontal.txt"
 		else:
-			self.init_distance = 120
+			self.init_distance = 121
+			self.f_height = 35
+			self.first_height = 100
 			self.xy_filepath = home + "/catkin_ws/src/MG400_basic/files/xy_calibration_horizontal.txt"
 			self.z_filepath = home + "/catkin_ws/src/MG400_basic/files/z_calibration_horizontal.txt"
 		self.result_file = home + "/catkin_ws/src/MG400_basic/files/" + dt_string + "-results.txt"
@@ -86,6 +91,7 @@ class MOVE:
 		self.place_y=240
 		self.place_x=154
 		self.init_r_coordinate =150
+		
 		self.r_coordinate = self.init_r_coordinate
 		self.x_a =0
 		self.y_a =0
@@ -244,20 +250,29 @@ class MOVE:
 
 	#decided the angle and distance coefcient
 	def get_coefficients(self, angle):
-		dist_coef, angle_coef =1,1
-		if angle < 40 and angle>=0:
+		dist_coef, angle_coef =1,0.1
+		if angle <40 and angle >0:
 			dist_coef = -0.00420*abs(angle) + 1.01260
 			angle_coef = -0.008857* abs(angle) +0.87428
 		elif angle >=40:
 			pass
-		elif angle <0 and angle >= -30:
-			dist_coef = -0.00420*abs(angle) + 1.01260
-			angle_coef = -0.008857* abs(angle) +0.8828
-		elif angle <-30 and angle>-40:
+		elif angle <=-3 and angle >-10:
+			dist_coef = -0.0016*abs(angle) + 0.9508
+			angle_coef = 0.0375* abs(angle) + 0.2125
+		elif angle <=-10 and angle >-25:
+			dist_coef = -0.00184*abs(angle) + 0.96557
+			angle_coef = -0.00046* abs(angle) + 0.57276
+		elif angle <=-25 and angle >= -35:
+			#need to calibrate more
+			dist_coef = -0.0016*abs(angle) + 0.9508
+			angle_coef = 0.00239* abs(angle) + 0.43692
+		elif angle <-35 and angle>-40:
+			# a little bit off
 			dist_coef = -0.00676*abs(angle) + 1.1133
 			# angle_coef = -0.00981*abs(angle) + 0.79615
 			angle_coef = 0.0159125*abs(angle) -0.081025
 		elif angle <= -40:
+			#maybe okay...
 			dist_coef = -0.004*abs(angle) + 1.022
 			angle_coef = 0.00115*abs(angle) + 0.42455
 		return dist_coef, angle_coef
@@ -290,7 +305,7 @@ class MOVE:
 		self.z_a = msg.z*self.z_r_coefficient + self.z_r_intercept
 		self._d = msg.z
 		_coef =0.7
-		self.arm_move(self.x_a*_coef,self.y_a, self.z_a-80, self.r_coordinate-msg.r)
+		self.arm_move(self.x_a*_coef,self.y_a, self.z_a-self.first_height, self.r_coordinate-msg.r)
 		
 		self.sync_robot()
 		self.mg400_dsth.publish(False)
@@ -303,7 +318,9 @@ class MOVE:
 		self.r_coordinate -= self.angle 
 		d = self.distance/math.cos(math.radians(self.angle/self.coeficient))
 		_y = d * math.sin(math.radians(self.angle/self.coeficient))
-		_x = self.distance -  self.distance * math.cos(math.radians(self.angle/self.coeficient)) -10
+		if self.angle <-3:
+			_y *=1.08
+		_x = self.distance -  self.distance * math.cos(math.radians(self.angle/self.coeficient))
 		self.arm_move(self.x_r+_x, self.y_r + _y, self.z_r, self.r_coordinate)
 
 	#adujst the angle move
@@ -324,8 +341,13 @@ class MOVE:
 		if self.r_r >150:
 				_ex *=-1
 		#reset behavior
-		self.arm_move(self.x_r- 40, self.y_r-_ex, self.z_r, self.r_r+_ex)
-		self.sync_robot()
+		print("z:", msg.z)
+		if msg.z == 10:
+			self.arm_move(self.x_r- 40, self.y_r-_ex, self.z_r, self.r_r+_ex)
+			self.sync_robot()
+		else:
+			self.arm_move(300, 0, 60, self.r_coordinate)
+			self.sync_robot()
 		self.arm_move(self.place_x ,self.place_y,60, self.r_coordinate)
 		self.sync_robot()
 
@@ -336,14 +358,18 @@ class MOVE:
 	#final move	
 	def F_move(self, msg):
 		self.getRobotCoordinate()
-		self.arm_move(self.x_r,self.y_r, self.z_r+35, self.r_coordinate)
+		self.arm_move(self.x_r,self.y_r, self.z_r+self.f_height, self.r_coordinate)
 		self.sync_robot()
 		self.getRobotCoordinate()
 			#115 is the dinstance from the camera to the object
 
 		d = self.distance/math.cos(math.radians(self.angle/self.coeficient))
 		dis_coef, angle_coef = self.get_coefficients(self.angle/self.coeficient)
-		_y = d* math.sin(math.radians(self.angle/self.coeficient))*angle_coef
+		if self.angle/self.coeficient >0 or self.angle/self.coeficient <-10:
+			_y = d* math.sin(math.radians(self.angle/self.coeficient))*angle_coef		
+		else:
+			_y=0
+		_y = d* math.sin(math.radians(self.angle/self.coeficient))*angle_coef	
 		_x = d* math.cos(math.radians(self.angle/self.coeficient))*dis_coef
 		print("d: ", d)
 		print("d*sinx",d* math.sin(math.radians(self.angle/self.coeficient)))
@@ -355,7 +381,9 @@ class MOVE:
 		print("y_adjustment",_y)
 		print("angle", self.angle/self.coeficient)
 		if self.x_r+_x <450:
+			#for experiment
 			self.arm_move(self.x_r+_x,self.y_r-_y, self.z_r, self.r_coordinate)
+			b_x = self.x_r+_x
 			pass
 		else:
 			print("out of range")
@@ -369,21 +397,21 @@ class MOVE:
 		rospy.sleep(2.)
 		self.getRobotCoordinate()
 		result = 1
-		if abs(b_r-self.r_r) > 4 or abs(b_y-self.y_r)>10:
+		if abs(b_r-self.r_r) > 4 or abs(b_y-self.y_r)>10 or abs(b_x - self.x_r) >10 :
 			result = 0
 		self.attempt+=1
 		# datetime object containing current date and time
 		now = datetime.now()
 		# dd/mm/YY H:M:S
 		dt_string = now.strftime("%Y/%m/%d-%H:%M:%S")	
-		# with open(self.result_file,"a+") as f:
-		# 	f.write(str(dt_string)+' ')
-		# 	f.write("大島 ")
-		# 	f.write(str(self.angle/self.coeficient) +' ')
-		# 	f.write(str(self._d) +' ')
-		# 	f.write(str(result)+'\n')
-		# rospy.sleep(2.)
-		# self.arm_reset()
+		with open(self.result_file,"a+") as f:
+			f.write(str(dt_string)+' ')
+			f.write("大島 ")
+			f.write(str(self.angle/self.coeficient) +' ')
+			f.write(str(self._d) +' ')
+			f.write(str(result)+'\n')
+		rospy.sleep(2.)
+		self.arm_reset()
 
 
 
