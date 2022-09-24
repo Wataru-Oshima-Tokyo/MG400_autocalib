@@ -36,13 +36,14 @@ class MOVE:
 			self.first_height = 70
 			self.xy_filepath = home + "/catkin_ws/src/MG400_basic/files/tec_xy_calibration_horizontal.txt"
 			self.z_filepath = home + "/catkin_ws/src/MG400_basic/files/tec_z_calibration_horizontal.txt"
+			self.result_file = home + "/catkin_ws/src/MG400_basic/files/" + "tech-"+ dt_string + "-results.txt"
 		else:
 			self.init_distance = 121
 			self.f_height = 35
 			self.first_height = 100
 			self.xy_filepath = home + "/catkin_ws/src/MG400_basic/files/xy_calibration_horizontal.txt"
 			self.z_filepath = home + "/catkin_ws/src/MG400_basic/files/z_calibration_horizontal.txt"
-		self.result_file = home + "/catkin_ws/src/MG400_basic/files/" + dt_string + "-results.txt"
+			self.result_file = home + "/catkin_ws/src/MG400_basic/files/" + dt_string + "-results.txt"
 		# MG400 services
 		self.arm_move =rospy.ServiceProxy('/mg400_bringup/srv/MovL',MovL)
 		self.collision_level =rospy.ServiceProxy('/mg400_bringup/srv/SetCollisionLevel',SetCollisionLevel)
