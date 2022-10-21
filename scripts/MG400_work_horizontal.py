@@ -10,9 +10,11 @@ import rospy
 import cv_bridge
 import numpy as np
 from mg400_bringup.srv import MovL, DO, EnableRobot, DisableRobot, SpeedL, AccL, Sync, ClearError,JointMovJ,SetCollisionLevel
+from mg400_bringup.srv import InsertStatus
 from mg400_bringup.msg import ToolVectorActual, RobotStatus
+from camera_pkg_msgs.msg import MobileRobotStatus
 from std_srvs.srv import Empty
-from std_srvs.srv import EmptyResponse
+from std_srvs.srv import EmptyResponse, SetBoolResponse
 from sklearn.linear_model import LinearRegression
 import time
 import math
@@ -47,7 +49,6 @@ class MOVE:
 		# MG400 services
 		self.arm_move =rospy.ServiceProxy('/mg400_bringup/srv/MovL',MovL)
 		self.collision_level =rospy.ServiceProxy('/mg400_bringup/srv/SetCollisionLevel',SetCollisionLevel)
-		
 		self.set_SpeedL =rospy.ServiceProxy('/mg400_bringup/srv/SpeedL',SpeedL)
 		self.set_AccL =rospy.ServiceProxy('/mg400_bringup/srv/AccL',AccL)
 		self.arm_enable = rospy.ServiceProxy('/mg400_bringup/srv/EnableRobot',EnableRobot)
@@ -67,14 +68,16 @@ class MOVE:
 		self.work_start_srv_ = rospy.Service('/mg400_work/start', Empty, self.work_start_service)
 		self.arm_reset =rospy.ServiceProxy('/arucodetect/reset',Empty)
 		self.detect_start =rospy.ServiceProxy('/arucodetect/start',Empty)
-		
-
+		self.insert_result_srvp_ =rospy.ServiceProxy('/insert_result',InsertStatus)
 		#Subscribers
+		self.battery_sub_ = rospy.Subscriber("/limo_status", MobileRobotStatus, self.battery_callback)
+		
 		self.sub = rospy.Subscriber("/outlet/coordinate", Coordinate, self.image_callback)
 		self.twist_pub = rospy.Subscriber('/mg400/cmd_vel', Twist, self.twist_callback)
 		self.robot_mode_sub = rospy.Subscriber('/mg400_bringup/msg/RobotStatus', RobotStatus, self.robotStatus_callback)
 
 		#Publishers
+		
 		self.mg400_dsth = rospy.Publisher("/mg400/working", Bool, queue_size=100)
 
 
@@ -92,7 +95,6 @@ class MOVE:
 		self.place_y=240
 		self.place_x=154
 		self.init_r_coordinate =150
-		
 		self.r_coordinate = self.init_r_coordinate
 		self.x_a =0
 		self.y_a =0
@@ -123,7 +125,11 @@ class MOVE:
 		self.x_r_coefficient = [0,0,0]
 		self.y_r_coefficient = [0,0,0]
 
-
+		#for charge topic
+		self.battery =0.0
+		self.battery_criteria =0.0
+		self.check_battery_ = False
+		self.insert_result =False
 		# start up
 		self.start_up()
 
@@ -149,6 +155,9 @@ class MOVE:
 		self.distance = self.init_distance
 		self.r_coordinate = self.init_r_coordinate
 		self.angle = 0
+		self.battery_criteria =0.0
+		self.check_battery_ = False
+		self.insert_result =False
 
 	#initialze the robot 
 	def initialize(self):
@@ -194,6 +203,11 @@ class MOVE:
 		except Exception as e:
 			print(e)
 
+	def insert_result_server(self, req):
+		if self.insert_result:
+			return SetBoolResponse(True, "Suceess")
+		else:
+			return SetBoolResponse(False, "Failed")
 
 	#get the robot status
 	def robotStatus_callback(self, robot_status):
@@ -337,13 +351,13 @@ class MOVE:
 		self.arm_enable()
 		rospy.sleep(2.)
 		self.getRobotCoordinate()
-		#rotate the endeffector to remove itself from the outlet
-		_ex = 90
-		if self.r_r >150:
-				_ex *=-1
-		#reset behavior
-		print("z:", msg.z)
 		if msg.z == 10:
+			#rotate the endeffector to remove itself from the outlet
+			_ex = 90
+			if self.r_r >150:
+				_ex *=-1
+			#reset behavior
+			print("z:", msg.z)
 			self.arm_move(self.x_r- 40, self.y_r-_ex, self.z_r, self.r_r+_ex)
 			self.sync_robot()
 		else:
@@ -353,11 +367,13 @@ class MOVE:
 		self.sync_robot()
 
 		#start detecting (this is for experiment)
-		self.detect_start()
+		if msg.z != 10:
+			self.detect_start()
 
 
 	#final move	
 	def F_move(self, msg):
+		self.insert_now()
 		self.getRobotCoordinate()
 		self.arm_move(self.x_r,self.y_r, self.z_r+self.f_height, self.r_coordinate)
 		self.sync_robot()
@@ -396,23 +412,37 @@ class MOVE:
 		b_y = self.y_r
 		self.arm_disable()
 		rospy.sleep(2.)
-		self.getRobotCoordinate()
-		result = 1
-		if abs(b_r-self.r_r) > 4 or abs(b_y-self.y_r)>10 or abs(b_x - self.x_r) >10 :
-			result = 0
-		self.attempt+=1
-		# datetime object containing current date and time
-		now = datetime.now()
-		# dd/mm/YY H:M:S
-		dt_string = now.strftime("%Y/%m/%d-%H:%M:%S")	
-		with open(self.result_file,"a+") as f:
-			f.write(str(dt_string)+' ')
-			f.write("大島 ")
-			f.write(str(self.angle/self.coeficient) +' ')
-			f.write(str(self._d) +' ')
-			f.write(str(result)+'\n')
-		rospy.sleep(2.)
-		self.arm_reset()
+		print("battery: ", self.battery)
+		print("battery_criteria", self.battery_criteria)
+
+		if self.battery >= self.battery_criteria+0.19:
+			pass
+		self.insert_result_srvp_()
+		rospy.sleep(0.5)
+		# start_time = rospy.Time.now().to_sec()
+		# end_time = rospy.Time.now().to_sec()
+		# # while end_time<start_time+2:
+		# # 	self.insert_result_pub_.publish(self.insert_result)
+		# # 	end_time = rospy.Time.now().to_sec()
+		# rospy.sleep(0.5)
+		# rospy.sleep(2.)
+		# self.getRobotCoordinate()
+		# result = 1
+		# if abs(b_r-self.r_r) > 4 or abs(b_y-self.y_r)>10 or abs(b_x - self.x_r) >10 :
+		# 	result = 0
+		# self.attempt+=1
+		# # datetime object containing current date and time
+		# now = datetime.now()
+		# # dd/mm/YY H:M:S
+		# dt_string = now.strftime("%Y/%m/%d-%H:%M:%S")	
+		# with open(self.result_file,"a+") as f:
+		# 	f.write(str(dt_string)+' ')
+		# 	f.write("大島 ")
+		# 	f.write(str(self.angle/self.coeficient) +' ')
+		# 	f.write(str(self._d) +' ')
+		# 	f.write(str(result)+'\n')
+		# rospy.sleep(2.)
+		# self.arm_reset()
 
 
 
@@ -440,7 +470,11 @@ class MOVE:
 			self.calib_arm_command(msg)
 		else:
 			self.execute_arm_commnd(msg)
+	def battery_callback(self, msg):
+		self.battery = msg.battery_voltage
 
+	def insert_now(self):
+		self.battery_criteria = self.battery
 
 	def image_callback(self, msg):
 		#initial postion for MG400 in image coordinate is 566(x),145(y) and robot coordination is (300, 0)
