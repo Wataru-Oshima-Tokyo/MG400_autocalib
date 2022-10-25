@@ -318,7 +318,8 @@ class MOVE:
 		self.x_a = msg.x*self.x_r_coefficient[0] + self.x_r_intercept
 		self.y_a = msg.y*self.y_r_coefficient[0] + self.y_r_intercept
 		self.z_a = msg.z*self.z_r_coefficient + self.z_r_intercept
-		self._d = msg.z
+		self.d_from_realsnese = msg.z
+		self.x_from_realsnese = msg.x
 		_coef =0.7
 		self.arm_move(self.x_a*_coef,self.y_a, self.z_a-self.first_height, self.r_coordinate-msg.r)
 		
@@ -414,35 +415,21 @@ class MOVE:
 		rospy.sleep(2.)
 		print("battery: ", self.battery)
 		print("battery_criteria", self.battery_criteria)
-
+		_result =0
 		if self.battery >= self.battery_criteria+0.19:
-			pass
-		self.insert_result_srvp_()
-		rospy.sleep(0.5)
-		# start_time = rospy.Time.now().to_sec()
-		# end_time = rospy.Time.now().to_sec()
-		# # while end_time<start_time+2:
-		# # 	self.insert_result_pub_.publish(self.insert_result)
-		# # 	end_time = rospy.Time.now().to_sec()
-		# rospy.sleep(0.5)
-		# rospy.sleep(2.)
-		# self.getRobotCoordinate()
-		# result = 1
-		# if abs(b_r-self.r_r) > 4 or abs(b_y-self.y_r)>10 or abs(b_x - self.x_r) >10 :
-		# 	result = 0
-		# self.attempt+=1
-		# # datetime object containing current date and time
-		# now = datetime.now()
-		# # dd/mm/YY H:M:S
-		# dt_string = now.strftime("%Y/%m/%d-%H:%M:%S")	
-		# with open(self.result_file,"a+") as f:
-		# 	f.write(str(dt_string)+' ')
-		# 	f.write("大島 ")
-		# 	f.write(str(self.angle/self.coeficient) +' ')
-		# 	f.write(str(self._d) +' ')
-		# 	f.write(str(result)+'\n')
-		# rospy.sleep(2.)
-		# self.arm_reset()
+			_result=1
+			self.insert_result_srvp_()
+		# datetime object containing current date and time
+		now = datetime.now()
+		# dd/mm/YY H:M:S
+		dt_string = now.strftime("%Y/%m/%d-%H:%M:%S")	
+		with open(self.result_file,"a+") as f:
+			f.write(str(dt_string)+' ')
+			f.write("大島 ")
+			f.write(str(self.angle/self.coeficient) +' ')
+			f.write(str(self.d_from_realsnese) +' ')
+			f.write(str(self.x_from_realsnese) +' ')
+			f.write(str(_result)+'\n')
 
 
 
