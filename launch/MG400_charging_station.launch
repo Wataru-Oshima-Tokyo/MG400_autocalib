@@ -8,8 +8,9 @@
     <arg name="offset_fixed_x" default="0.009"/>
     <arg name="offset_fixed_y" default="-0.0011"/>
     <arg name="offset_fixed_z" default="0.1397"/> <!-- 0.1397-->
+    <arg name="show_image" default="false"/> 
     <arg name="Kp" default="230.0"/>
-    <arg name="techshare" default="0"/>
+    <arg name="techshare" default="1"/>
     <arg name="calibration_path" default="$(find camera_pkg)/param"/> 
 
     <param name="robot_description" textfile="$(find mg400_description)/urdf/mg400_description.urdf"/>
@@ -54,6 +55,7 @@
     <param name="offset_fixed_x" value="$(arg offset_fixed_x)"/>
     <param name="offset_fixed_y" value="$(arg offset_fixed_y)"/>
     <param name="offset_fixed_z" value="$(arg offset_fixed_z)"/>
+    <param name="show_image" value="$(arg show_image)"/>
     <param name="calibration_path" value="$(arg calibration_path)/camera_ext.yaml" />
     <param name="Kp" value="$(arg Kp)" />
     </node>

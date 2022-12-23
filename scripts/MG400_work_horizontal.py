@@ -35,18 +35,19 @@ class MOVE:
 		if techshare==1:
 			self.init_distance = 92#110#88
 			self.f_height = 8
-			self.first_height = 70
-			self.xy_filepath = home + "/catkin_ws/src/MG400_basic/files/tec_xy_calibration_horizontal.txt"
-			self.z_filepath = home + "/catkin_ws/src/MG400_basic/files/tec_z_calibration_horizontal.txt"
+			self.first_height = 140
 			self.result_file = home + "/catkin_ws/src/MG400_basic/files/" + "tech-"+ dt_string + "-results.txt"
+                        self.xy_filepath = home + "/catkin_ws/src/MG400_basic/files/tec_xy_calibration_horizontal.txt"
+                        self.z_filepath = home + "/catkin_ws/src/MG400_basic/files/tec_z_calibration_horizontal.txt"
 		else:
 			self.init_distance = 121
 			self.f_height = 35
 			self.first_height = 100
-			self.xy_filepath = home + "/catkin_ws/src/MG400_basic/files/xy_calibration_horizontal.txt"
-			self.z_filepath = home + "/catkin_ws/src/MG400_basic/files/z_calibration_horizontal.txt"
 			self.result_file = home + "/catkin_ws/src/MG400_basic/files/" + dt_string + "-results.txt"
-		# MG400 services
+                        self.xy_filepath = home + "/catkin_ws/src/MG400_basic/files/xy_calibration_horizontal.txt"
+                        self.z_filepath = home + "/catkin_ws/src/MG400_basic/files/z_calibration_horizontal.txt"
+
+                # MG400 services
 		self.arm_move =rospy.ServiceProxy('/mg400_bringup/srv/MovL',MovL)
 		self.collision_level =rospy.ServiceProxy('/mg400_bringup/srv/SetCollisionLevel',SetCollisionLevel)
 		self.set_SpeedL =rospy.ServiceProxy('/mg400_bringup/srv/SpeedL',SpeedL)
@@ -418,7 +419,7 @@ class MOVE:
 		_result =0
 		if self.battery >= self.battery_criteria+0.19:
 			_result=1
-			self.insert_result_srvp_()
+		self.insert_result_srvp_()
 		# datetime object containing current date and time
 		now = datetime.now()
 		# dd/mm/YY H:M:S
@@ -547,9 +548,6 @@ class MOVE:
 		self.z_r_arr =[]
 
 		
-
-
-
 
 	def work_start_service(self,req):
 		print("start movement ")
