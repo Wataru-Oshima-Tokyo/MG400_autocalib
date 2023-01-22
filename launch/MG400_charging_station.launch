@@ -28,7 +28,7 @@
      <param name="techshare" type="int" value="$(arg techshare)"/>
     </node>
 
-    <node name="robot_state_publisher2" pkg="robot_state_publisher" type="robot_state_publisher"/>
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
     
      <node pkg="uvc_camera" type="uvc_camera_node" name="uvc_camera" output="screen" respawn="true">
     <param name="width" type="int" value="640" />
