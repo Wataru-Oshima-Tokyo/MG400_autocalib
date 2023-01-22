@@ -35,21 +35,19 @@ class MOVE:
 		if techshare==1:
 			self.init_distance = 92#110#88
 			self.f_height = 8
-			self.first_height = 70
-			self.xy_filepath = home + "/catkin_ws/src/MG400_basic/files/tec_xy_calibration_horizontal.txt"
-			self.z_filepath = home + "/catkin_ws/src/MG400_basic/files/tec_z_calibration_horizontal.txt"
-                        self.xy_filepath = home + "/catkin_ws/src/MG400_basic/files/xy_calibration_horizontal.txt"
-                        self.z_filepath = home + "/catkin_ws/src/MG400_basic/files/z_calibration_horizontal.txt"
-
+			self.first_height = 140
 			self.result_file = home + "/catkin_ws/src/MG400_basic/files/" + "tech-"+ dt_string + "-results.txt"
+                        self.xy_filepath = home + "/catkin_ws/src/MG400_basic/files/tec_xy_calibration_horizontal.txt"
+                        self.z_filepath = home + "/catkin_ws/src/MG400_basic/files/tec_z_calibration_horizontal.txt"
 		else:
 			self.init_distance = 121
 			self.f_height = 35
 			self.first_height = 100
-			self.xy_filepath = home + "/catkin_ws/src/MG400_basic/files/xy_calibration_horizontal.txt"
-			self.z_filepath = home + "/catkin_ws/src/MG400_basic/files/z_calibration_horizontal.txt"
 			self.result_file = home + "/catkin_ws/src/MG400_basic/files/" + dt_string + "-results.txt"
-		# MG400 services
+                        self.xy_filepath = home + "/catkin_ws/src/MG400_basic/files/xy_calibration_horizontal.txt"
+                        self.z_filepath = home + "/catkin_ws/src/MG400_basic/files/z_calibration_horizontal.txt"
+
+                # MG400 services
 		self.arm_move =rospy.ServiceProxy('/mg400_bringup/srv/MovL',MovL)
 		self.collision_level =rospy.ServiceProxy('/mg400_bringup/srv/SetCollisionLevel',SetCollisionLevel)
 		self.set_SpeedL =rospy.ServiceProxy('/mg400_bringup/srv/SpeedL',SpeedL)
@@ -74,7 +72,7 @@ class MOVE:
 		self.insert_result_srvp_ =rospy.ServiceProxy('/insert_result',InsertStatus)
 		#Subscribers
 		self.battery_sub_ = rospy.Subscriber("/limo_status", MobileRobotStatus, self.battery_callback)
-		
+		self.insert_status = rospy.Subscriber("/input_status", Bool, self.insert_status_callback)
 		self.sub = rospy.Subscriber("/outlet/coordinate", Coordinate, self.image_callback)
 		self.twist_pub = rospy.Subscriber('/mg400/cmd_vel', Twist, self.twist_callback)
 		self.robot_mode_sub = rospy.Subscriber('/mg400_bringup/msg/RobotStatus', RobotStatus, self.robotStatus_callback)
@@ -206,11 +204,10 @@ class MOVE:
 		except Exception as e:
 			print(e)
 
-	def insert_result_server(self, req):
-		if self.insert_result:
-			return SetBoolResponse(True, "Suceess")
-		else:
-			return SetBoolResponse(False, "Failed")
+
+
+	def insert_status_callback(self, msg):
+		self.insert_result = msg.data
 
 	#get the robot status
 	def robotStatus_callback(self, robot_status):
@@ -419,9 +416,11 @@ class MOVE:
 		print("battery: ", self.battery)
 		print("battery_criteria", self.battery_criteria)
 		_result =0
-		if self.battery >= self.battery_criteria+0.19:
+		if self.insert_result:
 			_result=1
-			self.insert_result_srvp_(1)
+			self.insert_result_srvp_(1) #succeeded 
+		else:
+			self.insert_result_srvp_(2) #Failed
 		# datetime object containing current date and time
 		now = datetime.now()
 		# dd/mm/YY H:M:S
@@ -550,9 +549,6 @@ class MOVE:
 		self.z_r_arr =[]
 
 		
-
-
-
 
 	def work_start_service(self,req):
 		print("start movement ")
