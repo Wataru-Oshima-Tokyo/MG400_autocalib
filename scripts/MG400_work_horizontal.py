@@ -457,6 +457,8 @@ class MOVE:
 			self.calib_arm_command(msg)
 		else:
 			self.execute_arm_commnd(msg)
+
+
 	def battery_callback(self, msg):
 		self.battery = msg.battery_voltage
 
@@ -492,9 +494,9 @@ class MOVE:
 			pose_z = np.array([[self.z_i]])
 			# z_coordiante = np.array([self.y_i])
 			if self.camera_coordinate_x.size == 0:
-				self.camera_coordinate_x =pose_x
-				self.camera_coordinate_y =pose_y
-				self.camera_coordinate_z =pose_z
+				self.camera_coordinate_x = pose_x
+				self.camera_coordinate_y = pose_y
+				self.camera_coordinate_z = pose_z
 				# self.camera_coordinate = pose
 				# self.camera_z = z_coordiante
 			else:
