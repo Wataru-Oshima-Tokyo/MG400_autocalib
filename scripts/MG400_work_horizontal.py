@@ -413,8 +413,11 @@ class MOVE:
 		b_y = self.y_r
 		self.arm_disable()
 		rospy.sleep(2.)
-		print("battery: ", self.battery)
-		print("battery_criteria", self.battery_criteria)
+		now = rospy.Time.now()
+		while now + rospy.Duration(2.) > rospy.Time.now():
+			rospy.sleep(0.1)
+		# print("battery: ", self.battery)
+		# print("battery_criteria", self.battery_criteria)
 		_result =0
 		if self.insert_result:
 			_result=1
