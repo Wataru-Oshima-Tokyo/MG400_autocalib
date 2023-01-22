@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# --*-- coding: utf-8 -*-
 import rospy
 from mg400_bringup.srv import InsertStatus
 
