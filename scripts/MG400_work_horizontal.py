@@ -418,7 +418,9 @@ class MOVE:
 		_result =0
 		if self.insert_result:
 			_result=1
-			self.insert_result_srvp_()
+			self.insert_result_srvp_(1) #succeeded 
+		else:
+			self.insert_result_srvp_(2) #Failed
 		# datetime object containing current date and time
 		now = datetime.now()
 		# dd/mm/YY H:M:S
