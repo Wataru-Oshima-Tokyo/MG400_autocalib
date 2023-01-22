@@ -38,6 +38,9 @@ class MOVE:
 			self.first_height = 70
 			self.xy_filepath = home + "/catkin_ws/src/MG400_basic/files/tec_xy_calibration_horizontal.txt"
 			self.z_filepath = home + "/catkin_ws/src/MG400_basic/files/tec_z_calibration_horizontal.txt"
+                        self.xy_filepath = home + "/catkin_ws/src/MG400_basic/files/xy_calibration_horizontal.txt"
+                        self.z_filepath = home + "/catkin_ws/src/MG400_basic/files/z_calibration_horizontal.txt"
+
 			self.result_file = home + "/catkin_ws/src/MG400_basic/files/" + "tech-"+ dt_string + "-results.txt"
 		else:
 			self.init_distance = 121
@@ -418,7 +421,7 @@ class MOVE:
 		_result =0
 		if self.battery >= self.battery_criteria+0.19:
 			_result=1
-			self.insert_result_srvp_()
+			self.insert_result_srvp_(1)
 		# datetime object containing current date and time
 		now = datetime.now()
 		# dd/mm/YY H:M:S

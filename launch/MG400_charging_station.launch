@@ -9,7 +9,7 @@
     <arg name="offset_fixed_y" default="-0.0011"/>
     <arg name="offset_fixed_z" default="0.1397"/> <!-- 0.1397-->
     <arg name="Kp" default="230.0"/>
-    <arg name="techshare" default="0"/>
+    <arg name="techshare" default="1"/>
     <arg name="calibration_path" default="$(find camera_pkg)/param"/> 
 
     <param name="robot_description" textfile="$(find mg400_description)/urdf/mg400_description.urdf"/>
@@ -27,7 +27,7 @@
      <param name="techshare" type="int" value="$(arg techshare)"/>
     </node>
 
-    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+    <node name="robot_state_publisher2" pkg="robot_state_publisher" type="robot_state_publisher"/>
     
      <node pkg="uvc_camera" type="uvc_camera_node" name="uvc_camera" output="screen" respawn="true">
     <param name="width" type="int" value="640" />
