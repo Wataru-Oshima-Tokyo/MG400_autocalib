@@ -140,13 +140,13 @@ class MOVE:
 		self.set_SpeedL(80)
 		self.set_AccL(80)
 		self.distance = self.init_distance
-		rospy.sleep(2.)
+		self.sleep(2)
 		self.arm_enable()
-		rospy.sleep(2.)
+		self.sleep(2)
 		while self.robot_mode == 0:
 			self.rate.sleep()
 		self.initialize()
-		rospy.sleep(2.)
+		self.sleep(2)
 		self.arm_move(self.place_x ,self.place_y,60, self.r_coordinate)
 		self.sync_robot()
 		self.move_stopper = False
@@ -165,11 +165,15 @@ class MOVE:
 		self.arm_disable()
 		self.clear_error()
 		self.arm_enable()
-		rospy.sleep(2)
+		self.sleep(2)
 		while self.robot_mode !=5:
 			self.rate.sleep()
 		# self.joint_move(0,0,0,0)
 
+	def sleep(self, duration):
+		now = rospy.Time.sleep()
+		while now + rospy.Duration(duration) > rospy.Time.now():
+			self.rate.sleep()
 
 	#read the calibration file
 	def readCalibFile(self):
@@ -230,7 +234,7 @@ class MOVE:
 	def sync_robot(self):
 			if self.robot_mode == 9:
 				self.initialize()
-			rospy.sleep(0.5)
+			self.sleep(0.5)
 			while self.robot_mode !=5:
 				if self.robot_mode == 9:
 					self.initialize()
@@ -350,7 +354,7 @@ class MOVE:
 	def I_move(self,msg):
 		self.initValue()
 		self.arm_enable()
-		rospy.sleep(2.)
+		self.sleep(2)
 		self.getRobotCoordinate()
 		if msg.z == 10:
 			#rotate the endeffector to remove itself from the outlet
@@ -412,10 +416,7 @@ class MOVE:
 		b_r = self.r_r
 		b_y = self.y_r
 		self.arm_disable()
-		rospy.sleep(2.)
-		now = rospy.Time.now()
-		while now + rospy.Duration(2.) > rospy.Time.now():
-			rospy.sleep(0.1)
+		self.sleep(2)
 		# print("battery: ", self.battery)
 		# print("battery_criteria", self.battery_criteria)
 		_result =0
@@ -423,7 +424,12 @@ class MOVE:
 			_result=1
 			self.insert_result_srvp_(1) #succeeded 
 		else:
+			self.arm_enable()
+			self.sleep(2)
+			self.arm_move(300, 0, 60, self.r_coordinate)
+			self.sync_robot()
 			self.insert_result_srvp_(2) #Failed
+			
 		# datetime object containing current date and time
 		now = datetime.now()
 		# dd/mm/YY H:M:S
@@ -561,7 +567,7 @@ class MOVE:
 		self.arm_enable()
 		self.pos_x =300
 		first_move = self.arm_move(self.pos_x, self.r_coordinate)
-		rospy.sleep(1)
+		self.sleep(1)
 		self.last_clb_time_ = rospy.get_time()
 		return EmptyResponse()
 
