@@ -171,8 +171,8 @@ class MOVE:
 		# self.joint_move(0,0,0,0)
 
 	def sleep(self, duration):
-		now = rospy.Time.sleep()
-		while now + rospy.Duration(duration) > rospy.Time.now():
+		now = rospy.Time().now()
+		while now + rospy.Duration(duration) > rospy.Time().now():
 			self.rate.sleep()
 
 	#read the calibration file
