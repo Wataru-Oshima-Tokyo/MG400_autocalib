@@ -424,9 +424,12 @@ class MOVE:
 			_result=1
 			self.insert_result_srvp_(1) #succeeded 
 		else:
+			self.initValue()
 			self.arm_enable()
 			self.sleep(2)
 			self.arm_move(300, 0, 60, self.r_coordinate)
+			self.sync_robot()
+			self.arm_move(self.place_x ,self.place_y,60, self.r_coordinate)
 			self.sync_robot()
 			self.insert_result_srvp_(2) #Failed
 			
